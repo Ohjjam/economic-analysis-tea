@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>PFD — Yim/Oh 2022 — Option A (H2 as MSP product) (auto first-cut)</title>
+<style>
+  :root, html[data-theme="light"] {
+    --bg: #fafafa; --fg: #111; --muted: #555; --accent: #1565C0;
+    --card: #fff; --border: #e0e0e0;
+  }
+  html[data-theme="dark"] {
+    --bg: #1a1a1a; --fg: #eee; --muted: #aaa; --accent: #64B5F6;
+    --card: #232323; --border: #333;
+  }
+  @media (prefers-color-scheme: dark) {
+    html[data-theme="auto"] {
+      --bg: #1a1a1a; --fg: #eee; --muted: #aaa; --accent: #64B5F6;
+      --card: #232323; --border: #333;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--fg); margin: 0;
+          font: 14px/1.5 -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  header { padding: 20px 28px; border-bottom: 1px solid var(--border);
+            background: var(--card); }
+  h1 { margin: 0; font-size: 20px; font-weight: 600; }
+  h1 .small { color: var(--muted); font-weight: 400; font-size: 14px; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 24px 28px; }
+  .card { background: var(--card); border: 1px solid var(--border);
+           border-radius: 8px; padding: 18px 22px; margin-bottom: 18px; }
+  h2 { margin-top: 0; font-size: 16px; color: var(--accent);
+        border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+  .kv { display: grid; grid-template-columns: 200px 1fr; gap: 6px 18px; }
+  .kv dt { color: var(--muted); }
+  .kv dd { margin: 0; font-weight: 500; }
+  table { width: 100%; border-collapse: collapse; margin: 6px 0; }
+  th, td { text-align: left; padding: 6px 10px;
+            border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 500; font-size: 12px;
+        text-transform: uppercase; letter-spacing: 0.04em; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .pfd-wrap { background: var(--card); border-radius: 8px;
+               border: 1px solid var(--border); padding: 14px;
+               position: relative; }
+  .pfd-toolbar { position: absolute; top: 12px; right: 14px; z-index: 5;
+                   display: flex; gap: 6px; }
+  .pfd-toolbar button { background: var(--card); color: var(--fg);
+                          border: 1px solid var(--border); border-radius: 4px;
+                          padding: 4px 10px; font-size: 13px; cursor: pointer; }
+  .pfd-toolbar button:hover { background: var(--accent); color: white; }
+  .pfd { width: 100%; height: 75vh; min-height: 560px;
+          overflow: hidden; cursor: grab; }
+  .pfd:active { cursor: grabbing; }
+  .pfd svg { width: 100% !important; height: 100% !important;
+               max-width: none !important; }
+  .pfd .node text, .pfd .nodeLabel, .pfd .edgeLabel { font-size: 15px !important; }
+  .pfd-fullscreen { position: fixed; inset: 0; z-index: 1000;
+                      background: var(--bg); padding: 60px 24px 24px; }
+  .pfd-fullscreen .pfd { height: calc(100vh - 100px); }
+  details.risks { margin-top: 8px; }
+  details.risks summary { cursor: pointer; color: var(--accent);
+                           font-weight: 500; padding: 4px 0; }
+  details.risks ul { margin: 6px 0; padding-left: 24px; }
+  footer { color: var(--muted); font-size: 12px;
+            padding: 18px 28px; text-align: center; }
+  .badge { display: inline-block; padding: 2px 8px;
+            background: var(--accent); color: white; border-radius: 4px;
+            font-size: 11px; margin-left: 6px; }
+  .theme-toggle { position: fixed; top: 14px; right: 16px;
+                   background: var(--card); color: var(--fg);
+                   border: 1px solid var(--border); border-radius: 6px;
+                   padding: 6px 12px; font-size: 13px; cursor: pointer;
+                   z-index: 100; }
+  .theme-toggle:hover { background: var(--accent); color: white; }
+  .chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+                 gap: 16px; }
+  .chart-box { background: var(--card); border: 1px solid var(--border);
+                border-radius: 6px; padding: 10px 14px; }
+  .chart-box h3 { margin: 0 0 8px 0; font-size: 13px; color: var(--muted);
+                   font-weight: 500; }
+  canvas { max-height: 220px; }
+</style>
+</head>
+<body>
+<button class="theme-toggle" onclick="toggleTheme()">🌓 theme</button>
+<header>
+  <h1>Yim/Oh 2022 — Option A (H2 as MSP product) (auto first-cut) <span class="small">— auto-variant of paper_yim_2022_modular_flow_lignin</span></h1>
+</header>
+<div class="container">
+
+  <div class="card pfd-wrap" id="pfd-card">
+    <h2>📐 Process Flow Diagram</h2>
+    <div class="pfd-toolbar">
+      <button onclick="pfdZoom(1.25)">🔍+</button>
+      <button onclick="pfdZoom(0.8)">🔍−</button>
+      <button onclick="pfdReset()">↺ reset</button>
+      <button onclick="pfdFullscreen()">⛶ full</button>
+    </div>
+    <div class="pfd" id="pfd-host">
+      <pre class="mermaid">
+flowchart LR
+    in_Organosolv_Lignin(["Organosolv Lignin<br/>1.1 g"])
+    in_PMA(["PMA<br/>11 g"])
+    in_H2SO4(["H2SO4<br/>1.18 g"])
+    in_H2O(["H2O<br/>12 g"])
+    in_Chloroform(["Chloroform<br/>6 g"])
+    sec_pretreat["Feedstock Pretreatment"]
+    sec_rxn["Reaction<br/>80 °C · 35 bar · 31.8 min · 1.5 V · 20.5 mA/cm² · FE 100%"]
+    sec_sep1["Chloroform extraction"]
+    sec_sep2["Density-based phase separation"]
+    sec_sep3["Chloroform recovery"]
+    sec_sep4["Vanillin crystallisation"]
+    sec_sep5["Electrolyzer ❨PMA reactivation + HER❩"]
+    out_H2(["H2<br/>0.0022 g"])
+    out_Vanillin(["Vanillin<br/>0.00055 g"])
+    out_Acetovanillone(["Acetovanillone<br/>0.000187 g"])
+    in_Organosolv_Lignin --> sec_pretreat
+    sec_pretreat -->|feed slurry| sec_rxn
+    sec_rxn -->|crude product| sec_sep1
+    sec_sep1 -->|biphasic mixture| sec_sep2
+    sec_sep2 -->|organic phase| sec_sep3
+    sec_sep2 -->|aqueous phase| sec_sep5
+    sec_sep3 -->|concentrated product| sec_sep4
+    sec_sep3 -.->|recycle solvent| sec_sep1
+    sec_sep5 -.->|recycle catalyst / electrolyte| sec_pretreat
+    in_PMA -->|catalyst ❨initial charge❩| sec_pretreat
+    in_PMA -.->|catalyst makeup ❨1.0% drag-out❩| sec_pretreat
+    in_H2SO4 -->|acid or base ❨initial charge❩| sec_pretreat
+    in_H2SO4 -.->|acid or base makeup ❨3.0% drag-out❩| sec_pretreat
+    in_H2O -->|utility ❨initial charge❩| sec_pretreat
+    in_H2O -.->|utility makeup ❨5.0% drag-out❩| sec_pretreat
+    in_Chloroform -->|extraction solvent ❨initial charge❩| sec_sep1
+    in_Chloroform -.->|extraction solvent makeup ❨5.0% drag-out❩| sec_sep1
+    sec_sep5 -.->|recycle PMA ❨99%❩| sec_pretreat
+    sec_sep5 -.->|recycle H2SO4 ❨97%❩| sec_pretreat
+    sec_sep5 -.->|recycle H2O ❨95%❩| sec_pretreat
+    sec_sep3 -.->|recycle Chloroform ❨95%❩| sec_sep1
+    sec_sep5 --> out_H2
+    sec_sep4 --> out_Vanillin
+    sec_sep4 --> out_Acetovanillone
+    classDef feed       fill:#FFE0B2,stroke:#E65100;
+    classDef prod       fill:#C8E6C9,stroke:#2E7D32;
+    classDef rxn        fill:#E1BEE7,stroke:#6A1B9A;
+    classDef catalyst   fill:#F8BBD0,stroke:#AD1457;
+    classDef solvent    fill:#B2DFDB,stroke:#00695C;
+    classDef acidbase   fill:#FFCDD2,stroke:#C62828;
+    classDef utility    fill:#CFD8DC,stroke:#455A64;
+    classDef consumable fill:#D1C4E9,stroke:#4527A0;
+    class in_H2SO4 acidbase;
+    class in_H2O utility;
+    class in_Chloroform solvent;
+    class in_Organosolv_Lignin feed;
+    class in_PMA catalyst;
+    class out_H2,out_Vanillin,out_Acetovanillone prod;
+    class sec_pretreat,sec_rxn,sec_sep1,sec_sep2,sec_sep3,sec_sep4,sec_sep5 rxn;
+      </pre>
+    </div>
+  </div>
+
+  <div class='card'><h2>⚙️ Operating conditions</h2><table><tr><th>Stage</th><th>Type</th><th>Conditions</th></tr><tr><td><b>Reaction</b></td><td>electrochemical</td><td>T = <b>80 °C</b> · P = 35 bar · τ = 31.8 min · V = <b>1.5 V</b> · j = <b>20.5 mA/cm²</b> · FE = 100%</td></tr></table></div>
+
+  <div class='card'><h2>⚡ Energy OPEX (annualised @ 10 t/batch)</h2><table><tr><th>Line item</th><th class='num'>$/year</th></tr><tr><td>  Utility - Electricity</td><td class='num'>$2,981/y</td></tr><tr><td>  Utility - Lps Steam</td><td class='num'>$47/y</td></tr></table><p class='small' style='color:var(--muted);margin-top:8px'>Electricity and heat-duty OPEX are derived from the operating conditions above (V × j × area × t, or LPS kg / kg water for evaporation). If a line is missing, the auto-builder did not have enough info to compute it — refine the YAML or paper-grade builder.</p></div>
+
+  <div class="card">
+    <h2>📊 Topline TEA <span class="badge">at 10 t/batch</span></h2>
+    <dl class="kv">
+      <dt>CAPEX total</dt><dd>$12.93 M</dd>
+      <dt>CAPEX annualized</dt><dd>$1.52 M/y</dd>
+      <dt>OPEX</dt><dd>$123.29 M/y</dd>
+      <dt>Revenue total</dt><dd>$2.47 M/y</dd>
+      <dt>Net profit</dt><dd>$-122.34 M/y</dd>
+      <dt>MSP (H2)</dt><dd>$413.21 /kg</dd>
+    </dl>
+  </div>
+
+  <div class='card'><h2>💰 Revenue breakdown @ 10 t/batch</h2><table><tr><th>Product</th><th class='num'>$M/y</th></tr><tr><td>H2</td><td class='num'>$0.60</td></tr><tr><td>Vanillin</td><td class='num'>$1.12</td></tr><tr><td>Acetovanillone</td><td class='num'>$0.76</td></tr></table></div>
+
+  <div class="card">
+    <h2>📈 Scale-up ladder</h2>
+    <table>
+      <tr><th>Stage</th><th class="num">t/batch</th>
+          <th class="num">CAPEX ($M)</th><th class="num">OPEX ($M/y)</th>
+          <th class="num">Revenue ($M/y)</th><th class="num">Net ($M/y)</th>
+          <th class="num">MSP ($/kg)</th></tr>
+      <tr><td>Lab</td><td class='num'>0.001</td><td class='num'>0.14</td><td class='num'>0.04</td><td class='num'>0.00</td><td class='num'>-0.06</td><td class='num'>1973.04</td></tr><tr><td>Bench</td><td class='num'>0.01</td><td class='num'>0.30</td><td class='num'>0.18</td><td class='num'>0.00</td><td class='num'>-0.21</td><td class='num'>719.34</td></tr><tr><td>Pilot</td><td class='num'>0.1</td><td class='num'>0.90</td><td class='num'>1.39</td><td class='num'>0.02</td><td class='num'>-1.47</td><td class='num'>496.12</td></tr><tr><td>Demo</td><td class='num'>1</td><td class='num'>3.32</td><td class='num'>12.73</td><td class='num'>0.25</td><td class='num'>-12.88</td><td class='num'>434.85</td></tr><tr><td>Commercial</td><td class='num'>10</td><td class='num'>12.93</td><td class='num'>123.29</td><td class='num'>2.47</td><td class='num'>-122.34</td><td class='num'>413.21</td></tr>
+    </table>
+    <p><b>Recommendation:</b> No stage is currently profitable. Tighten upstream yield, cheapen feed, or add a co-product revenue line before scale-up commitment.</p>
+  </div>
+
+  <div class='card'><h2>📉 Sensitivity sweeps</h2><div class='chart-grid'><div class='chart-box'><h3>Organosolv Lignin ($/kg)</h3><canvas id='chart_Organosolv_Lignin____kg_'></canvas></div></div></div>
+
+  <div class='card'><h2>⚠️ Scale-up risks</h2><details class='risks' open><summary>Generic (5)</summary><ul><li>Electrode area scales linearly with current — capex of the cell stack dominates and does NOT follow the 6/10 rule.</li><li>Gas management: H2/O2 evolution rates scale linearly; explosion-proof venting and gas-liquid disengagement become mandatory above pilot.</li><li>Membrane lifetime (Nafion/PEM): expect 5-7 y replacement; build into OPEX as a periodic stream.</li><li>Current distribution uniformity is hard above ~1 m² electrode — split into multiple cells in series rather than one giant cell.</li><li>Electrolyte purification / makeup gets expensive at commercial scale; consider in-loop ion-exchange.</li></ul></details><details class='risks'><summary>Downstream (4)</summary><ul><li>Distillation: reflux ratio + tray count must be set from VLE data, not lab approximation; capex follows ~0.65 scaling.</li><li>Extraction: solvent recovery loop is essential — virgin solvent OPEX kills the economics if recovery &lt; 95%.</li><li>Crystallisation: scale-up to &gt;1 ton requires a defined cooling profile (PAT/seeding) to avoid agglomeration.</li><li>Membrane separation: flux declines with feed concentration; fouling cleaning cycle = OPEX line.</li></ul></details><details class='risks'><summary>EHS / safety (3)</summary><ul><li>Chloroform is a suspected carcinogen — closed handling, vapor recovery, and exposure monitoring required at &gt;100 L.</li><li>Sulfuric acid: pH &lt; 1 streams need Hastelloy/PTFE wetted parts; spill containment per OSHA HCS.</li><li>H2 is highly flammable, LEL 4 vol-%; ventilation + leak monitoring + ATEX.</li></ul></details></div>
+
+  <div class="card">
+    <h2>🧪 Inputs / outputs (per batch)</h2>
+    <table>
+      <tr><th>Stream</th><th>Role</th><th class="num">g/batch</th>
+          <th class="num">Recovery</th></tr>
+      <tr><td>Organosolv Lignin</td><td>input</td><td class='num'>1.1</td><td class='num'>0.00</td></tr><tr><td>PMA</td><td>input</td><td class='num'>11</td><td class='num'>0.99</td></tr><tr><td>H2SO4</td><td>input</td><td class='num'>1.18</td><td class='num'>0.97</td></tr><tr><td>H2O</td><td>input</td><td class='num'>12</td><td class='num'>0.95</td></tr><tr><td>Chloroform</td><td>input</td><td class='num'>6</td><td class='num'>0.95</td></tr><tr><td>H2</td><td>output</td><td class='num'>0.0022</td><td class='num'>—</td></tr><tr><td>Vanillin</td><td>output</td><td class='num'>0.00055</td><td class='num'>—</td></tr><tr><td>Acetovanillone</td><td>output</td><td class='num'>0.000187</td><td class='num'>—</td></tr>
+    </table>
+  </div>
+
+  <div class='card'><h2>📚 Chemical price references</h2><table><tr><th>Component</th><th class='num'>Active $/kg</th><th>Active source</th><th>Other sources on file</th></tr><tr><td>Acetovanillone</td><td class='num'>$30.00</td><td>Sigma specialty 2024</td><td class='small' style='color:var(--muted)'>Pharma-grade intermediate 2024 $50.00</td></tr><tr><td>Chloroform</td><td class='num'>$1.50</td><td>Made-in-China / Echemi 2024</td><td class='small' style='color:var(--muted)'>ICIS spec grade 2024 $3.00; Sigma reagent grade 2024 $120.00</td></tr><tr><td>H2</td><td class='num'>$2.00</td><td>Grey H2 baseline 2024</td><td class='small' style='color:var(--muted)'>Blue H2 typical 2024 $4.00; Green H2 PEM electrolysis 2024 $6.00; Hydrogen Council 2024 reference 2024 $8.00</td></tr><tr><td>H2O</td><td class='num'>$0.00</td><td>Nat Commun 2021</td><td class='small' style='color:var(--muted)'></td></tr><tr><td>H2SO4</td><td class='num'>$0.04</td><td>Made-in-China bulk 2024</td><td class='small' style='color:var(--muted)'>ICIS contract Europe 2024 $0.10; USGS commodity 2024 2024 $0.05</td></tr><tr><td>Organosolv Lignin</td><td class='num'>$0.40</td><td>Technical lignin (organosolv oak), industrial 2024</td><td class='small' style='color:var(--muted)'></td></tr><tr><td>PMA</td><td class='num'>$0.01</td><td>Made-in-China bulk 2024</td><td class='small' style='color:var(--muted)'>Industrial reagent estimate 2024 $0.05; Sigma reagent grade 2024 $2.00</td></tr><tr><td>Vanillin</td><td class='num'>$15.00</td><td>Echemi synthetic vanillin 2024</td><td class='small' style='color:var(--muted)'>Average market vanillin 2024 $25.00; Natural vanillin from lignin (premium) 2024 $80.00; Bourbon vanilla premium 2024 $200.00</td></tr></table></div>
+
+  <div class="card">
+    <h2>🛠️ Equipment</h2>
+    <table>
+      <tr><th>Section</th><th>Equipment</th><th class="num">Base cost ($)</th>
+          <th>Source</th><th>Lifetime</th></tr>
+      <tr><td>Feedstock Pretreatment</td><td>Pretreatment Mill / Mixer</td><td class='num'>$120,000</td><td>default</td><td>permanent</td></tr><tr><td>Reaction
+80 °C · 35 bar · 31.8 min · 1.5 V · 20.5 mA/cm² · FE 100%</td><td>Electrolyzer cell housing</td><td class='num'>$10,000</td><td>260506 COOR-ORR TEA workbook</td><td>30 y</td></tr><tr><td>Reaction
+80 °C · 35 bar · 31.8 min · 1.5 V · 20.5 mA/cm² · FE 100%</td><td>Electrode pair</td><td class='num'>$964</td><td>260506 COOR-ORR TEA workbook</td><td>5 y</td></tr><tr><td>Reaction
+80 °C · 35 bar · 31.8 min · 1.5 V · 20.5 mA/cm² · FE 100%</td><td>Nafion 117 membrane</td><td class='num'>$180</td><td>Chemours catalog</td><td>5 y</td></tr><tr><td>Reaction
+80 °C · 35 bar · 31.8 min · 1.5 V · 20.5 mA/cm² · FE 100%</td><td>Balance of plant (BoP)</td><td class='num'>$3,500</td><td>industry standard 35% factor</td><td>30 y</td></tr><tr><td>Chloroform extraction</td><td>Chloroform extraction unit (In-line liquid-liquid extraction)</td><td class='num'>$250,000</td><td>default</td><td>permanent</td></tr><tr><td>Density-based phase separation</td><td>Density-based phase separation unit (Phase separation)</td><td class='num'>$100,000</td><td>default</td><td>permanent</td></tr><tr><td>Chloroform recovery</td><td>Chloroform recovery unit (Distillation)</td><td class='num'>$500,000</td><td>default</td><td>permanent</td></tr><tr><td>Vanillin crystallisation</td><td>Vanillin crystallisation unit (Cooling crystallization)</td><td class='num'>$300,000</td><td>default</td><td>permanent</td></tr><tr><td>Electrolyzer (PMA reactivation + HER)</td><td>Electrolyzer (PMA reactivation + HER) unit (Flow electrolyzer (Nafion-based PEM))</td><td class='num'>$100,000</td><td>default</td><td>permanent</td></tr>
+    </table>
+  </div>
+
+</div>
+
+<footer>
+  Generated by tea_tool · auto-builder · 2026-05-27 16:53<br>
+  Mermaid via CDN — internet required for first load, then cached.
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+  function pickMermaidTheme() {
+    const t = document.documentElement.getAttribute("data-theme");
+    if (t === "dark") return "dark";
+    if (t === "light") return "default";
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "default";
+  }
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: pickMermaidTheme(),
+    securityLevel: "loose",
+    flowchart: {
+      htmlLabels: true, curve: "basis",
+      nodeSpacing: 60, rankSpacing: 90,
+      padding: 10,
+    },
+    themeVariables: { fontSize: "15px" }
+  });
+
+  // After mermaid renders the SVG, attach pan-zoom controls.
+  window.__panZoomInstance = null;
+  window.addEventListener("load", () => {
+    setTimeout(() => {
+      const svg = document.querySelector("#pfd-host svg");
+      if (!svg) return;
+      svg.style.maxWidth = "none";
+      svg.style.width = "100%";
+      svg.style.height = "100%";
+      window.__panZoomInstance = svgPanZoom(svg, {
+        zoomEnabled: true,
+        panEnabled: true,
+        controlIconsEnabled: false,
+        fit: true, center: true,
+        minZoom: 0.3, maxZoom: 8,
+        zoomScaleSensitivity: 0.3,
+      });
+    }, 400);
+  });
+
+  window.pfdZoom = (factor) => {
+    if (window.__panZoomInstance) window.__panZoomInstance.zoomBy(factor);
+  };
+  window.pfdReset = () => {
+    if (window.__panZoomInstance) {
+      window.__panZoomInstance.resetZoom();
+      window.__panZoomInstance.center();
+      window.__panZoomInstance.fit();
+    }
+  };
+  window.pfdFullscreen = () => {
+    const card = document.getElementById("pfd-card");
+    card.classList.toggle("pfd-fullscreen");
+    setTimeout(() => { if (window.__panZoomInstance) {
+      window.__panZoomInstance.resize();
+      window.__panZoomInstance.fit();
+      window.__panZoomInstance.center();
+    } }, 100);
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script>
+  function toggleTheme() {
+    const cur = document.documentElement.getAttribute("data-theme");
+    const next = (cur === "dark") ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    localStorage.setItem("tea-theme", next);
+    location.reload();
+  }
+  // restore
+  const saved = localStorage.getItem("tea-theme");
+  if (saved) document.documentElement.setAttribute("data-theme", saved);
+
+  const SENSITIVITY_DATA = {"Organosolv Lignin ($/kg)": [[0.05, 238.21186705977036], [0.2, 313.2118670597703], [0.4, 413.2118670597703], [0.8, 613.2118670597704], [2.0, 1213.2118670597702]]};
+  window.addEventListener("DOMContentLoaded", () => {
+    const txt = getComputedStyle(document.documentElement).getPropertyValue("--fg").trim();
+    const acc = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim();
+    for (const [title, points] of Object.entries(SENSITIVITY_DATA)) {
+      const id = "chart_" + title.replace(/[^a-zA-Z0-9]/g, "_");
+      const el = document.getElementById(id);
+      if (!el) continue;
+      new Chart(el, {
+        type: "line",
+        data: {
+          labels: points.map(p => p[0]),
+          datasets: [{
+            label: "MSP ($/kg)",
+            data: points.map(p => p[1]),
+            borderColor: acc, backgroundColor: acc + "33",
+            tension: 0.3, pointRadius: 5,
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          scales: { x: { ticks: { color: txt } },
+                    y: { ticks: { color: txt }, title: { display: true, text: "MSP ($/kg)", color: txt } } },
+          plugins: { legend: { display: false } }
+        }
+      });
+    }
+  });
+</script>
+</body>
+</html>

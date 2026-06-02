@@ -1,0 +1,87 @@
+# Paper: Nie, Jiang, Sang, Zheng, Li, Liu, Liang et al.,
+# Nature Communications 16, 5895 (2025).
+# "Accelerating water dissociation to achieve ampere-level hydrogen
+#  peroxide electrosynthesis in brine and seawater"
+meta:
+  name: "Nie 2025 — Ampere-level H2O2 in seawater (Ni(OH)2/CNT)"
+  slug: "paper_nie_2025_h2o2_seawater"
+  date: 2025-06-15
+  researcher: "Nie, Jiang, Liang et al. (Nat Commun)"
+  lab: "(paper reproduction)"
+  notes: |
+    Ni(OH)2 nanoplates on CNTs accelerate water dissociation in
+    neutral brine/seawater electrolyte, supporting 1 A/cm² 2e- ORR.
+    H2O2 yield 141 mol/g_cat/h at 1 A/cm² in 1 M NaCl, >150 h stability
+    at 200 mA/cm². In natural seawater FE > 70% at 100 mA/cm².
+
+chemistry:
+  reaction_type: "electrochemical"
+  description: |
+    2-electron ORR in brine/seawater. Cathode: O2 + H2O + 2 e- ->
+    HO2- + OH-. Anode: standard OER (4 OH- -> O2 + 2 H2O + 4 e-).
+  reactions:
+    - lhs: "O2 + H2O + 2 e-"
+      rhs: "HO2- + OH-"
+      role: "cathode"
+    - lhs: "4 OH-"
+      rhs: "O2 + 2 H2O + 4 e-"
+      role: "anode"
+  target_products:
+    - "H2O2"
+
+feedstock:
+  primary:
+    name: "O2"
+    mass_per_batch_g: 100.0
+    price_usd_per_kg: 0.032
+    source_note: "Air-separation O2"
+  reagents:
+    - name: "H2O"
+      mass_per_batch_g: 200.0
+      recovery_fraction: 0.0
+      role: "utility"
+      price_usd_per_kg: 0.0          # seawater = free
+  # Seawater electrolyte modelled as zero-cost utility (no KOH).
+
+operating_conditions:
+  temperature_C: 25
+  pressure_bar: 1
+  ph: 7
+  reaction_time_h: 1.0
+  electrochem:
+    cell_voltage_V: 2.0
+    current_density_mA_cm2: 1000      # ampere-level
+    faradaic_efficiency_pct: 80
+    electrode_area_cm2: 1.0
+    electrolyte: "1 M NaCl (brine) or natural seawater"
+    membrane: "AEM"
+
+results:
+  yields:
+    - product: "H2O2"
+      yield_pct: 4.8
+      selectivity_pct: 80
+  conversion_pct: 12
+  notes: "Long-term stability 150 h at 200 mA/cm²."
+
+downstream:
+  - step: "H2O2 polishing"
+    method: "Membrane separation"
+    recovery_pct: 92
+    target_purity_pct: 30
+
+constraints:
+  preferred_msp_product: "H2O2"
+  hazardous_materials: ["h2o2"]
+  scale_up_priority: "opex"
+  plant_lifetime_years: 20
+  discount_rate: 0.08
+
+scale_targets:
+  scales_ton_per_batch: [0.001, 0.01, 0.1, 1.0, 10.0]
+  capacity_factor: 0.96
+  batch_hours: 1.0
+
+reported:
+  msp_usd_per_kg: 0.95
+  source: "Nie et al., Nat Commun 16, 5895 (2025); SI cost estimate"

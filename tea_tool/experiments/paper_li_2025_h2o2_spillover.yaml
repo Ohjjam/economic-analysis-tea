@@ -1,0 +1,86 @@
+# Paper: Li, Nie, Wu, Guan, Xia, Huang, Duan, Chen,
+# Advanced Materials 37, 2412039 (2025).
+# "Water Spillover to Expedite Two-Electron Oxygen Reduction"
+meta:
+  name: "Li 2025 — Water spillover 2e-ORR"
+  slug: "paper_li_2025_h2o2_spillover"
+  date: 2025-02-10
+  researcher: "Li, Nie, Chen et al. (Adv Mater)"
+  lab: "(paper reproduction)"
+  notes: |
+    Single-site catalyst with water-spillover mechanism. Lowered
+    activation barrier for proton coupled electron transfer step.
+    Reports stable H2O2 production at sustained high FE.
+
+chemistry:
+  reaction_type: "electrochemical"
+  description: |
+    Cathodic 2e- ORR with water-spillover-promoted proton supply.
+  reactions:
+    - lhs: "O2 + H2O + 2 e-"
+      rhs: "HO2- + OH-"
+      role: "cathode"
+    - lhs: "4 OH-"
+      rhs: "O2 + 2 H2O + 4 e-"
+      role: "anode"
+  target_products:
+    - "H2O2"
+
+feedstock:
+  primary:
+    name: "O2"
+    mass_per_batch_g: 50.0
+    price_usd_per_kg: 0.032
+    source_note: "Air-separation O2"
+  reagents:
+    - name: "KOH"
+      mass_per_batch_g: 2.8
+      recovery_fraction: 0.99
+      role: "solvent"
+      price_usd_per_kg: 0.57
+    - name: "H2O"
+      mass_per_batch_g: 100.0
+      recovery_fraction: 0.99
+      role: "utility"
+      price_usd_per_kg: 0.00022
+
+operating_conditions:
+  temperature_C: 25
+  pressure_bar: 1
+  ph: 13
+  reaction_time_h: 1.5
+  electrochem:
+    cell_voltage_V: 1.6
+    current_density_mA_cm2: 300
+    faradaic_efficiency_pct: 95
+    electrode_area_cm2: 1.0
+    electrolyte: "0.5 M KOH"
+    membrane: "AEM"
+
+results:
+  yields:
+    - product: "H2O2"
+      yield_pct: 6.5
+      selectivity_pct: 95
+
+downstream:
+  - step: "H2O2 polishing"
+    method: "Distillation"
+    recovery_pct: 92
+    target_purity_pct: 30
+
+constraints:
+  preferred_msp_product: "H2O2"
+  hazardous_materials: ["h2o2", "koh"]
+  scale_up_priority: "balanced"
+  plant_lifetime_years: 20
+  discount_rate: 0.08
+
+scale_targets:
+  scales_ton_per_batch: [0.001, 0.01, 0.1, 1.0, 10.0]
+  capacity_factor: 0.92
+  batch_hours: 1.5
+
+reported:
+  msp_usd_per_kg: 1.21
+  source: "Li et al., Adv Mater 37, 2412039 (2025); estimated from FE+V"

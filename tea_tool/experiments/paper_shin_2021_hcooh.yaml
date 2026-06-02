@@ -1,0 +1,90 @@
+# Paper: Shin, Hansen, Jiao, Nat Sustain 4, 911-919 (2021).
+# "Techno-economic assessment of low-temperature carbon dioxide electrolysis"
+# Default product: formic acid (HCOOH) on a bipolar-membrane MEA.
+meta:
+  name: "Shin 2021 — CO2 -> HCOOH (BPM MEA)"
+  slug: "paper_shin_2021_hcooh"
+  date: 2021-08-01
+  researcher: "Shin, Hansen, Jiao (Nat Sustain)"
+  lab: "Univ. of Delaware (paper reproduction)"
+  notes: |
+    BPM-based MEA cell for CO2 reduction to HCOOH.
+    Reported MSP: $0.59/kg HCOOH (already feasible vs $0.50/kg market).
+    Plant scale 50 000 kg-product/d (~18 250 t/y).
+
+chemistry:
+  reaction_type: "electrochemical"
+  description: |
+    Bipolar-membrane MEA cell: CO2 + 2 H+ + 2 e- -> HCOOH at cathode;
+    H2O -> 0.5 O2 + 2 H+ + 2 e- at anode (OER).
+  reactions:
+    - lhs: "CO2 + 2 H+ + 2 e-"
+      rhs: "HCOOH"
+      role: "cathode"
+    - lhs: "H2O"
+      rhs: "0.5 O2 + 2 H+ + 2 e-"
+      role: "anode"
+  target_products:
+    - "HCOOH"
+    - "O2"
+    - "H2"
+
+feedstock:
+  primary:
+    name: "CO2"
+    mass_per_batch_g: 1.05
+    price_usd_per_kg: 0.03
+    source_note: "Industrial CO2 @ $0.03/kg, single-pass (no recycle)"
+  reagents:
+    - name: "H2O"
+      mass_per_batch_g: 0.45
+      recovery_fraction: 0.0
+      role: "utility"
+      price_usd_per_kg: 0.00022
+
+operating_conditions:
+  temperature_C: 25
+  pressure_bar: 1
+  ph: 1
+  reaction_time_h: 1.0
+  electrochem:
+    cell_voltage_V: 3.5
+    current_density_mA_cm2: 100
+    faradaic_efficiency_pct: 90
+    electrode_area_cm2: 100
+    electrolyte: "BPM (no liquid electrolyte)"
+    membrane: "Bipolar membrane"
+
+results:
+  yields:
+    - product: "HCOOH"
+      yield_pct: 95.2
+      selectivity_pct: 90
+    - product: "O2"
+      yield_pct: 30.5
+    - product: "H2"
+      yield_pct: 1.9
+
+downstream:
+  - step: "Gas-liquid separation"
+    method: "Flash drum"
+    recovery_pct: 99
+  - step: "Anode PSA"
+    method: "PSA (O2 / CO2)"
+    recovery_pct: 95
+  - step: "HCOOH distillation"
+    method: "Distillation"
+    recovery_pct: 92
+    target_purity_pct: 99
+
+constraints:
+  preferred_msp_product: "HCOOH"
+  hazardous_materials: ["co2", "hcooh"]
+  scale_up_priority: "opex"
+  plant_lifetime_years: 20
+  discount_rate: 0.08
+
+scale_targets:
+  scales_ton_per_batch: [0.01, 0.1, 1.0, 10.0, 50.0]
+  capacity_factor: 0.96
+  batch_hours: 1.0

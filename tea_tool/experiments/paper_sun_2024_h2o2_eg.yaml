@@ -1,0 +1,103 @@
+# Paper: Sun, Fan, Li, Wang, Yang, Li, Shao, Duan, Nature Communications 15, 6098 (2024).
+# "Boosting electrochemical oxygen reduction to hydrogen peroxide
+#  coupled with organic oxidation"  (Ni single-atom catalyst)
+meta:
+  name: "Sun 2024 — paired H2O2 + glycolic acid (Ni-SAC + EG)"
+  slug: "paper_sun_2024_h2o2_eg"
+  date: 2024-07-19
+  researcher: "Sun, Fan, Duan et al. (Nat Commun)"
+  lab: "BUCT (paper reproduction)"
+  notes: |
+    Cathodic 2e- ORR coupled with anodic ethylene-glycol oxidation
+    on a Ni single-atom catalyst (SAC). H2O2 yield 7.30 mol/g_cat/h;
+    co-product glycolic acid valorises the anode and pays for the cell.
+
+chemistry:
+  reaction_type: "electrochemical"
+  description: |
+    Paired-electrolysis H2O2 plant: cathodic O2 + H2O + 2 e- ->
+    HO2- + OH-, anodic ethylene glycol -> glycolic acid + 2 H+ + 2 e-.
+    Ni single-atom catalyst suppresses the 4e- pathway.
+  reactions:
+    - lhs: "O2 + H2O + 2 e-"
+      rhs: "HO2- + OH-"
+      role: "cathode"
+    - lhs: "EG"
+      rhs: "Glycolic acid + 2 H+ + 2 e-"
+      role: "anode"
+  target_products:
+    - "H2O2"
+    - "Glycolic acid"
+
+feedstock:
+  primary:
+    name: "EG"
+    mass_per_batch_g: 5.0
+    price_usd_per_kg: 0.80
+    source_note: "Ethylene glycol bulk industrial"
+  reagents:
+    - name: "O2"
+      mass_per_batch_g: 30.0
+      recovery_fraction: 0.95
+      role: "input"
+      price_usd_per_kg: 0.032
+    - name: "KOH"
+      mass_per_batch_g: 5.6
+      recovery_fraction: 0.99
+      role: "solvent"
+      price_usd_per_kg: 0.57
+    - name: "H2O"
+      mass_per_batch_g: 100.0
+      recovery_fraction: 0.99
+      role: "utility"
+      price_usd_per_kg: 0.00022
+
+operating_conditions:
+  temperature_C: 25
+  pressure_bar: 1
+  ph: 13
+  reaction_time_h: 2.0
+  electrochem:
+    cell_voltage_V: 1.2
+    current_density_mA_cm2: 200
+    faradaic_efficiency_pct: 92
+    electrode_area_cm2: 1.0
+    electrolyte: "1 M KOH"
+    membrane: "Anion-exchange"
+
+results:
+  yields:
+    - product: "H2O2"
+      yield_pct: 5.2
+      selectivity_pct: 92
+    - product: "Glycolic acid"
+      yield_pct: 28.0
+      selectivity_pct: 88
+  conversion_pct: 35
+  notes: "Ni-SAC, H2O2 yield = 7.30 mol/g_cat/h."
+
+downstream:
+  - step: "H2O2 polishing"
+    method: "Distillation"
+    recovery_pct: 90
+    target_purity_pct: 30
+  - step: "Glycolic acid recovery"
+    method: "Crystallization + filtration"
+    recovery_pct: 85
+    target_purity_pct: 95
+
+constraints:
+  preferred_msp_product: "H2O2"
+  hazardous_materials: ["h2o2", "koh"]
+  scale_up_priority: "balanced"
+  plant_lifetime_years: 20
+  discount_rate: 0.10
+
+scale_targets:
+  scales_ton_per_batch: [0.001, 0.01, 0.1, 1.0, 10.0]
+  capacity_factor: 0.92
+  batch_hours: 2.0
+
+reported:
+  msp_usd_per_kg: 1.09
+  source: "Sun et al., Nat Commun 15, 6098 (2024); SI MSP estimate"

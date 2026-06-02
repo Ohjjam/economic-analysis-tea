@@ -1,0 +1,114 @@
+# Example experiment — Lignin oxidation via microwave + PMA + electrolysis.
+# Fully populated reference YAML for demoing the AI design pipeline.
+meta:
+  name: "Lignin oxidation - microwave + PMA"
+  slug: "lignin_pma_mw"
+  date: 2026-05-27
+  researcher: "Hyeonmyeong Oh"
+  lab: "UNIST Energy & Chemical Engineering"
+  notes: |
+    Demonstrates the full schema. The reaction is microwave-assisted lignin
+    depolymerization where polyoxometalate (PMA) is the redox mediator;
+    electrolytic re-oxidation regenerates PMA and produces co-product H2.
+
+chemistry:
+  reaction_type: "electrochemical"
+  description: |
+    Microwave-assisted oxidation of organosolv lignin with PMA in acidic
+    aqueous media; reduced PMA is regenerated at the anode while H2 is
+    co-produced at the cathode.
+  reactions:
+    - lhs: "Lignin + PMA(ox)"
+      rhs: "Vanillin + Vanillic acid + PMA(red)"
+      role: "main"
+    - lhs: "PMA(red) -> PMA(ox)"
+      rhs: "(anodic)"
+      role: "regeneration"
+    - lhs: "2 H+ + 2 e-"
+      rhs: "H2"
+      role: "cathode"
+  target_products:
+    - "Vanillin"
+    - "Vanillic acid"
+    - "H2"
+
+feedstock:
+  primary:
+    name: "Organosolv Lignin"
+    mass_per_batch_g: 5.0
+    purity_pct: 95
+    price_usd_per_kg: 0.4
+    source_note: "Industrial organosolv lignin (oak)"
+  reagents:
+    - name: "PMA"
+      mass_per_batch_g: 1.0
+      recovery_fraction: 0.99
+      role: "catalyst"
+      price_usd_per_kg: 0.01
+    - name: "H2SO4"
+      mass_per_batch_g: 1.2
+      recovery_fraction: 0.97
+      role: "solvent"
+      price_usd_per_kg: 0.037
+    - name: "H2O"
+      mass_per_batch_g: 6.0
+      recovery_fraction: 0.99
+      role: "utility"
+      price_usd_per_kg: 0.00022
+
+operating_conditions:
+  temperature_C: 80
+  pressure_bar: 1
+  ph: 1.5
+  reaction_time_h: 2.0
+  batch_volume_ml: 50
+  electrochem:
+    cell_voltage_V: 0.95
+    current_density_mA_cm2: 100
+    faradaic_efficiency_pct: 92
+    electrode_area_cm2: 5.0
+    electrolyte: "0.5 M H2SO4"
+    membrane: "Nafion 117"
+  thermal:
+    heating_method: "microwave"
+    power_W: 300
+
+results:
+  yields:
+    - product: "Vanillin"
+      yield_pct: 4.5
+      selectivity_pct: 32
+    - product: "Vanillic acid"
+      yield_pct: 2.1
+      selectivity_pct: 15
+    - product: "H2"
+      yield_pct: 0.55
+  conversion_pct: 28
+  mass_balance_closure_pct: 91
+  energy_consumption_kWh_per_kg_product: null
+  notes: "GC-FID for monomers; HPLC for acids; GC-TCD for H2."
+
+downstream:
+  - step: "Extraction"
+    method: "Liquid-liquid (chloroform)"
+    solvent: "Chloroform"
+    solvent_loading_kg_per_kg_feed: 5.0
+    recovery_pct: 95
+  - step: "Crystallisation"
+    method: "Cooling crystallization"
+    target_purity_pct: 98
+    recovery_pct: 80
+
+constraints:
+  must_have_unit_operations: []
+  avoid_unit_operations: []
+  preferred_msp_product: "Vanillin"
+  hazardous_materials: ["chloroform"]
+  scale_up_priority: "balanced"
+  plant_lifetime_years: 20
+  discount_rate: 0.10
+
+scale_targets:
+  scales_ton_per_batch: [0.01, 0.1, 1.0, 5.0, 10.0]
+  capacity_factor: 0.8
+  batch_hours: 2.0

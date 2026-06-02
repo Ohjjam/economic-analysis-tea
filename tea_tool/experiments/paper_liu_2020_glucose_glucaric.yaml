@@ -1,0 +1,98 @@
+# Paper: Liu, Xu, Zhao et al., Nature Communications 11, 265 (2020).
+# "Efficient electrochemical production of glucaric acid and H2 via
+#  glucose electrolysis"  (NiFeOx / NiFeNx on Ni foam, anode)
+meta:
+  name: "Liu 2020 — Glucose -> glucaric acid + H2 (NiFe)"
+  slug: "paper_liu_2020_glucose_glucaric"
+  date: 2020-01-14
+  researcher: "Liu, Xu, Zhao et al. (Nat Commun)"
+  lab: "Anhui / USTC (paper reproduction)"
+  notes: |
+    Nanostructured NiFe oxide / nitride on Ni foam. Anodic glucose
+    oxidation -> glucaric acid; cathodic HER -> H2. Cell delivers
+    100 mA/cm² at 1.39 V, FE 87 %, glucaric acid yield 83 %.
+    Reported electrochemical glucaric-acid manufacturing is 54 %
+    cheaper than the chemical (nitric-acid) route.
+
+chemistry:
+  reaction_type: "electrochemical"
+  description: |
+    Anode: glucose + 6 H2O -> glucaric acid + 12 H+ + 12 e-.
+    Cathode: 12 H+ + 12 e- -> 6 H2.
+    NiFe layered double hydroxide-derived anode catalyst.
+  reactions:
+    - lhs: "glucose + 6 H2O"
+      rhs: "glucaric acid + 12 H+ + 12 e-"
+      role: "anode"
+    - lhs: "12 H+ + 12 e-"
+      rhs: "6 H2"
+      role: "cathode"
+  target_products:
+    - "Glucaric acid"
+    - "H2"
+
+feedstock:
+  primary:
+    name: "Glucose"
+    mass_per_batch_g: 5.0
+    price_usd_per_kg: 0.40
+    source_note: "Bulk glucose, biomass-derived"
+  reagents:
+    - name: "KOH"
+      mass_per_batch_g: 5.6
+      recovery_fraction: 0.99
+      role: "solvent"
+      price_usd_per_kg: 0.57
+    - name: "H2O"
+      mass_per_batch_g: 100.0
+      recovery_fraction: 0.99
+      role: "utility"
+      price_usd_per_kg: 0.00022
+
+operating_conditions:
+  temperature_C: 25
+  pressure_bar: 1
+  ph: 13
+  reaction_time_h: 2.0
+  electrochem:
+    cell_voltage_V: 1.39
+    current_density_mA_cm2: 100
+    faradaic_efficiency_pct: 87
+    electrode_area_cm2: 1.0
+    electrolyte: "1 M KOH"
+    membrane: "AEM"
+
+results:
+  yields:
+    - product: "Glucaric acid"
+      yield_pct: 83
+      selectivity_pct: 87
+    - product: "H2"
+      yield_pct: 1.5
+  conversion_pct: 95
+
+downstream:
+  - step: "Glucaric acid crystallization"
+    method: "Acidification + crystallization"
+    recovery_pct: 92
+    target_purity_pct: 98
+  - step: "H2 polishing"
+    method: "PSA"
+    recovery_pct: 98
+    target_purity_pct: 99.99
+
+constraints:
+  preferred_msp_product: "Glucaric acid"
+  hazardous_materials: ["h2", "koh"]
+  scale_up_priority: "opex"
+  plant_lifetime_years: 20
+  discount_rate: 0.08
+
+scale_targets:
+  scales_ton_per_batch: [0.01, 0.1, 1.0, 5.0, 10.0]
+  capacity_factor: 0.92
+  batch_hours: 2.0
+
+reported:
+  msp_usd_per_kg: 2.50
+  source: "Liu et al., Nat Commun 11, 265 (2020); 54% cheaper than chemical route ($5.4/kg)"

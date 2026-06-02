@@ -1,0 +1,94 @@
+# Paper: Mosalpuri, Li, Wright, ACS Sust. Chem. Eng. 2023.
+# "Techno-Economic Analysis and Life Cycle Assessment of Hydroxylamine
+#  Eco-Manufacturing via Wastewater Electrochemical"
+meta:
+  name: "Mosalpuri 2023 — Nitrate -> Hydroxylamine"
+  slug: "paper_mosalpuri_2023_nh2oh"
+  date: 2023-09-01
+  researcher: "Mosalpuri, Li, Wright (ACS SCE)"
+  lab: "Iowa State (paper reproduction)"
+  notes: |
+    Two-step electrochemical reduction of wastewater nitrate (7.14 mM)
+    after concentration by electrodialysis to 2 M, then NO3- -> NO2- ->
+    NH2OH. Reported MSP $5.37/kg NH2OH (current) -> $2.06/kg (optimistic);
+    market reference $1.72/kg.
+
+chemistry:
+  reaction_type: "electrochemical"
+  description: |
+    Two-step electrochemical nitrate reduction in wastewater context.
+    Step 1: NO3- + H2O + 2 e- -> NO2- + 2 OH-  (OD-Ag, FE ~95%).
+    Step 2: NO2- + 2 H2O + 4 e- -> NH2OH + 3 OH-  (selective cathode).
+  reactions:
+    - lhs: "NO3- + H2O + 2 e-"
+      rhs: "NO2- + 2 OH-"
+      role: "cathode-step1"
+    - lhs: "NO2- + 2 H2O + 4 e-"
+      rhs: "NH2OH + 3 OH-"
+      role: "cathode-step2"
+  target_products:
+    - "NH2OH"
+    - "O2"
+
+feedstock:
+  primary:
+    name: "NaNO3"
+    mass_per_batch_g: 2.6
+    price_usd_per_kg: 0.0
+    source_note: "Wastewater nitrate (7.14 mM) — treated as free feedstock"
+  reagents:
+    - name: "H2O"
+      mass_per_batch_g: 60.0
+      recovery_fraction: 0.0
+      role: "utility"
+      price_usd_per_kg: 0.00022
+    - name: "KOH"
+      mass_per_batch_g: 0.05
+      recovery_fraction: 0.999
+      role: "solvent"
+      price_usd_per_kg: 0.57
+
+operating_conditions:
+  temperature_C: 25
+  pressure_bar: 1
+  ph: 12
+  reaction_time_h: 2.0
+  electrochem:
+    cell_voltage_V: 1.8
+    current_density_mA_cm2: 50
+    faradaic_efficiency_pct: 75
+    electrode_area_cm2: 100
+    electrolyte: "wastewater + KOH catholyte"
+    membrane: "cation-exchange (ED)"
+
+results:
+  yields:
+    - product: "NH2OH"
+      yield_pct: 38.5
+      selectivity_pct: 75
+    - product: "O2"
+      yield_pct: 19.2
+
+downstream:
+  - step: "Wastewater pretreatment"
+    method: "Activated sludge"
+    recovery_pct: 99
+  - step: "Nitrate concentration"
+    method: "Electrodialysis (7.14 mM -> 2 M)"
+    recovery_pct: 95
+  - step: "Product separation"
+    method: "Electrodialysis (NH2OH recovery)"
+    recovery_pct: 88
+    target_purity_pct: 95
+
+constraints:
+  preferred_msp_product: "NH2OH"
+  hazardous_materials: ["nh2oh", "koh"]
+  scale_up_priority: "balanced"
+  plant_lifetime_years: 20
+  discount_rate: 0.10
+
+scale_targets:
+  scales_ton_per_batch: [0.01, 0.1, 1.0, 5.0, 10.0]
+  capacity_factor: 0.90
+  batch_hours: 2.0

@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>PFD — COOR-ORR paired electrolysis (1V pulse, LDG feed) (auto first-cut)</title>
+<style>
+  :root, html[data-theme="light"] {
+    --bg: #fafafa; --fg: #111; --muted: #555; --accent: #1565C0;
+    --card: #fff; --border: #e0e0e0;
+  }
+  html[data-theme="dark"] {
+    --bg: #1a1a1a; --fg: #eee; --muted: #aaa; --accent: #64B5F6;
+    --card: #232323; --border: #333;
+  }
+  @media (prefers-color-scheme: dark) {
+    html[data-theme="auto"] {
+      --bg: #1a1a1a; --fg: #eee; --muted: #aaa; --accent: #64B5F6;
+      --card: #232323; --border: #333;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--fg); margin: 0;
+          font: 14px/1.5 -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  header { padding: 20px 28px; border-bottom: 1px solid var(--border);
+            background: var(--card); }
+  h1 { margin: 0; font-size: 20px; font-weight: 600; }
+  h1 .small { color: var(--muted); font-weight: 400; font-size: 14px; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 24px 28px; }
+  .card { background: var(--card); border: 1px solid var(--border);
+           border-radius: 8px; padding: 18px 22px; margin-bottom: 18px; }
+  h2 { margin-top: 0; font-size: 16px; color: var(--accent);
+        border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+  .kv { display: grid; grid-template-columns: 200px 1fr; gap: 6px 18px; }
+  .kv dt { color: var(--muted); }
+  .kv dd { margin: 0; font-weight: 500; }
+  table { width: 100%; border-collapse: collapse; margin: 6px 0; }
+  th, td { text-align: left; padding: 6px 10px;
+            border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 500; font-size: 12px;
+        text-transform: uppercase; letter-spacing: 0.04em; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .pfd-wrap { background: var(--card); border-radius: 8px;
+               border: 1px solid var(--border); padding: 14px;
+               position: relative; }
+  .pfd-toolbar { position: absolute; top: 12px; right: 14px; z-index: 5;
+                   display: flex; gap: 6px; }
+  .pfd-toolbar button { background: var(--card); color: var(--fg);
+                          border: 1px solid var(--border); border-radius: 4px;
+                          padding: 4px 10px; font-size: 13px; cursor: pointer; }
+  .pfd-toolbar button:hover { background: var(--accent); color: white; }
+  /* PFD scroll-host. SVG renders at its natural width (mermaid's default);
+     if it's wider than the viewport the host scrolls horizontally.
+     Height grows to fit the SVG so nothing is ever clipped vertically. */
+  .pfd { width: 100%; overflow: auto; padding: 8px 0; }
+  .pfd svg { display: block; margin: 0 auto;
+               max-width: none;
+               height: auto;
+               transform-origin: top left;
+               transform: scale(var(--pfd-scale, 1)); }
+  .pfd .node text, .pfd .nodeLabel, .pfd .edgeLabel { font-size: 14px !important; }
+  .pfd-fullscreen { position: fixed; inset: 0; z-index: 1000;
+                      background: var(--bg); padding: 60px 24px 24px;
+                      overflow: auto; }
+  details.risks { margin-top: 8px; }
+  details.risks summary { cursor: pointer; color: var(--accent);
+                           font-weight: 500; padding: 4px 0; }
+  details.risks ul { margin: 6px 0; padding-left: 24px; }
+  footer { color: var(--muted); font-size: 12px;
+            padding: 18px 28px; text-align: center; }
+  .badge { display: inline-block; padding: 2px 8px;
+            background: var(--accent); color: white; border-radius: 4px;
+            font-size: 11px; margin-left: 6px; }
+  .theme-toggle { position: fixed; top: 14px; right: 16px;
+                   background: var(--card); color: var(--fg);
+                   border: 1px solid var(--border); border-radius: 6px;
+                   padding: 6px 12px; font-size: 13px; cursor: pointer;
+                   z-index: 100; }
+  .theme-toggle:hover { background: var(--accent); color: white; }
+  .chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+                 gap: 16px; }
+  .chart-box { background: var(--card); border: 1px solid var(--border);
+                border-radius: 6px; padding: 10px 14px; }
+  .chart-box h3 { margin: 0 0 8px 0; font-size: 13px; color: var(--muted);
+                   font-weight: 500; }
+  canvas { max-height: 220px; }
+</style>
+</head>
+<body>
+<button class="theme-toggle" onclick="toggleTheme()">🌓 theme</button>
+<header>
+  <h1>COOR-ORR paired electrolysis (1V pulse, LDG feed) (auto first-cut) <span class="small">— TEA workbook</span></h1>
+</header>
+<div class="container">
+
+  <div class="card pfd-wrap" id="pfd-card">
+    <h2>📐 Process Flow Diagram</h2>
+    <div class="pfd-toolbar">
+      <button onclick="pfdZoom(1.25)">🔍+</button>
+      <button onclick="pfdZoom(0.8)">🔍−</button>
+      <button onclick="pfdReset()">↺ reset</button>
+      <button onclick="pfdFullscreen()">⛶ full</button>
+    </div>
+    <div class="pfd" id="pfd-host">
+      <pre class="mermaid">
+flowchart LR
+    in_LDG_gas_CO_surrogate(["LDG gas ❨CO surrogate❩<br/>3.27 g"])
+    in_O2(["O2<br/>64.3 g"])
+    in_KOH(["KOH<br/>5 g"])
+    in_H2O(["H2O<br/>100 g"])
+    sec_pretreat["Feedstock Pretreatment"]
+    sec_rxn["Reaction<br/>25 °C · 3 h · 1 V · 95 mA/cm² · FE 73.1%"]
+    sec_sep1["K2CO3 crystallization"]
+    sec_sep2["H2O2 polishing"]
+    sec_sep3["Gas recycle ❨CO/O2❩"]
+    out_H2O2(["H2O2<br/>0.159249 g"])
+    out_K2CO3(["K2CO3<br/>0.7521 g"])
+    in_LDG_gas_CO_surrogate --> sec_pretreat
+    sec_pretreat -->|feed slurry| sec_rxn
+    sec_rxn -->|crude product| sec_sep1
+    sec_sep2 -->|concentrated product| sec_sep1
+    in_O2 -->| ❨initial charge❩| sec_pretreat
+    in_O2 -.->| makeup ❨1.0% drag-out❩| sec_pretreat
+    in_KOH -->|acid or base ❨initial charge❩| sec_pretreat
+    in_KOH -.->|acid or base makeup ❨1.0% drag-out❩| sec_pretreat
+    in_H2O -->|utility ❨initial charge❩| sec_pretreat
+    in_H2O -.->|utility makeup ❨1.0% drag-out❩| sec_pretreat
+    sec_sep1 -.->|recycle KOH ❨99%❩, H2O ❨99%❩| sec_pretreat
+    sec_sep3 --> out_H2O2
+    sec_sep1 --> out_K2CO3
+    classDef feed       fill:#FFE0B2,stroke:#E65100;
+    classDef prod       fill:#C8E6C9,stroke:#2E7D32;
+    classDef rxn        fill:#E1BEE7,stroke:#6A1B9A;
+    classDef catalyst   fill:#F8BBD0,stroke:#AD1457;
+    classDef solvent    fill:#B2DFDB,stroke:#00695C;
+    classDef acidbase   fill:#FFCDD2,stroke:#C62828;
+    classDef utility    fill:#CFD8DC,stroke:#455A64;
+    classDef consumable fill:#D1C4E9,stroke:#4527A0;
+    class in_H2O utility;
+    class in_LDG_gas_CO_surrogate,in_O2 feed;
+    class in_KOH acidbase;
+    class out_H2O2,out_K2CO3 prod;
+    class sec_pretreat,sec_rxn,sec_sep1,sec_sep2,sec_sep3 rxn;
+      </pre>
+    </div>
+  </div>
+
+  <div class='card'><h2>⚙️ Operating conditions</h2><table><tr><th>Stage</th><th>Type</th><th>Conditions</th></tr><tr><td><b>Reaction</b></td><td>electrochemical</td><td>T = <b>25 °C</b> · P = 1 bar · τ = 3 h · V = <b>1 V</b> · j = <b>95 mA/cm²</b> · FE = 73.1%</td></tr></table></div>
+
+  <div class='card'><h2>⚡ Energy OPEX (annualised @ 10 t/batch)</h2><table><tr><th>Line item</th><th class='num'>$/year</th></tr><tr><td>  Utility - Electricity</td><td class='num'>$117/y</td></tr><tr><td>  Utility - Lps Steam</td><td class='num'>$47/y</td></tr></table><p class='small' style='color:var(--muted);margin-top:8px'>Electricity (electrolysis) = specific energy × H₂ output × $/kWh; heat = reactor/evaporation duty × $/GJ. The basis values above carry [n] links to the numbered reference list.</p></div>
+
+  <div class="card">
+    <h2>📊 Topline TEA <span class="badge">at 10 t/batch</span></h2>
+    <dl class="kv">
+      <dt>CAPEX total</dt><dd>$11.90 M</dd>
+      <dt>CAPEX annualized</dt><dd>$0.96 M/y</dd>
+      <dt>OPEX</dt><dd>$2.80 M/y</dd>
+      <dt>Revenue total</dt><dd>$6.55 M/y</dd>
+      <dt>Net profit</dt><dd><b>$2.79 M/y</b></dd>
+      <dt>MSP of H2O2</dt><dd>$-1.44 /kg</dd>
+    </dl>
+    <p class="small" style="color:var(--muted);margin-top:6px">
+      <b>MSP of H2O2</b> = the H2O2 selling price at which the
+      project breaks even (NPV = 0 over the plant life), <i>after</i> crediting
+      revenue from all co-products. Net profit above uses current market prices
+      for every product.</p>
+  </div>
+
+  <div class='card'><h2>💰 Revenue breakdown @ 10 t/batch</h2><table><tr><th>Product</th><th class='num'>$M/y</th></tr><tr><td>H2O2</td><td class='num'>$0.82</td></tr><tr><td>K2CO3</td><td class='num'>$5.73</td></tr></table></div>
+
+  <div class='card'><h2>💵 Detailed economics by scale</h2><table><tr><th>Line item ($M/y unless noted)</th><th class='num'>0.001 t/batch</th><th class='num'>0.01 t/batch</th><th class='num'>0.1 t/batch</th><th class='num'>1 t/batch</th><th class='num'>10 t/batch</th></tr><tr><td><span>Annualized CAPEX</span></td><td class='num'>$0.01 M</td><td class='num'>$0.02 M</td><td class='num'>$0.06 M</td><td class='num'>$0.24 M</td><td class='num'>$0.96 M</td></tr><tr><td><span>  Feedstock OPEX</span></td><td class='num'>$0.00 M</td><td class='num'>$0.00 M</td><td class='num'>$0.00 M</td><td class='num'>$0.04 M</td><td class='num'>$0.42 M</td></tr><tr><td><span>  Utility OPEX (heat + electricity)</span></td><td class='num'>$0.00 M</td><td class='num'>$0.00 M</td><td class='num'>$0.00 M</td><td class='num'>$0.00 M</td><td class='num'>$0.00 M</td></tr><tr><td><span>  Maintenance + operation</span></td><td class='num'>$0.01 M</td><td class='num'>$0.04 M</td><td class='num'>$0.15 M</td><td class='num'>$0.60 M</td><td class='num'>$2.38 M</td></tr><tr><td><b>OPEX total</b></td><td class='num'>$0.01 M</td><td class='num'>$0.04 M</td><td class='num'>$0.16 M</td><td class='num'>$0.64 M</td><td class='num'>$2.80 M</td></tr><tr><td><span>  Revenue — H2O2</span></td><td class='num'>$0.00 M</td><td class='num'>$0.00 M</td><td class='num'>$0.01 M</td><td class='num'>$0.08 M</td><td class='num'>$0.82 M</td></tr><tr><td><span>  Revenue — K2CO3</span></td><td class='num'>$0.00 M</td><td class='num'>$0.01 M</td><td class='num'>$0.06 M</td><td class='num'>$0.57 M</td><td class='num'>$5.73 M</td></tr><tr><td><b>Revenue total</b></td><td class='num'>$0.00 M</td><td class='num'>$0.01 M</td><td class='num'>$0.07 M</td><td class='num'>$0.66 M</td><td class='num'>$6.55 M</td></tr><tr><td><b>Net profit</b></td><td class='num'>$-0.02 M</td><td class='num'>$-0.05 M</td><td class='num'>$-0.15 M</td><td class='num'>$-0.23 M</td><td class='num'>$2.79 M</td></tr><tr><td><b>MSP of H2O2</b></td><td class='num'><b>$136.65/kg</b></td><td class='num'><b>$39.17/kg</b></td><td class='num'><b>$11.96/kg</b></td><td class='num'><b>$2.29/kg</b></td><td class='num'><b>$-1.44/kg</b></td></tr></table><p class='small' style='color:var(--muted);margin-top:8px'>Net profit = revenue total − (annualized CAPEX + OPEX total), at current market prices. Utility OPEX bundles heat (steam/reactor duty) and electricity (electrolysis); see the Energy OPEX card for the split.</p></div>
+
+  <div class='card'><h2>🏭 CAPEX breakdown (every unit, installed @ 10 t/batch)</h2><table><tr><th>Equipment</th><th class='num'>Installed cost</th><th>Source / basis</th></tr><tr style='background:var(--border)'><td colspan='3'><b>Feedstock Pretreatment</b></td></tr><tr><td style='padding-left:20px'>Pretreatment Mill / Mixer</td><td class='num'>$706,231</td><td class='small'></td></tr><tr><td style='padding-left:20px;color:var(--muted)'><i>Feedstock Pretreatment subtotal</i></td><td class='num' style='color:var(--muted)'><i>$706,231</i></td><td></td></tr><tr style='background:var(--border)'><td colspan='3'><b>Reaction
+25 °C · 3 h · 1 V · 95 mA/cm² · FE 73.1%</b></td></tr><tr><td style='padding-left:20px'>Electrolyzer cell housing</td><td class='num'>$10,526</td><td class='small'>260506 COOR-ORR TEA workbook</td></tr><tr><td style='padding-left:20px'>Electrode pair</td><td class='num'>$1,014</td><td class='small'>260506 COOR-ORR TEA workbook</td></tr><tr><td style='padding-left:20px'>Nafion 117 membrane</td><td class='num'>$758</td><td class='small'>Chemours catalog</td></tr><tr><td style='padding-left:20px'>Balance of plant (BoP)</td><td class='num'>$3,684</td><td class='small'>industry standard 35% factor</td></tr><tr><td style='padding-left:20px;color:var(--muted)'><i>Reaction
+25 °C · 3 h · 1 V · 95 mA/cm² · FE 73.1% subtotal</i></td><td class='num' style='color:var(--muted)'><i>$15,983</i></td><td></td></tr><tr style='background:var(--border)'><td colspan='3'><b>K2CO3 crystallization</b></td></tr><tr><td style='padding-left:20px'>K2CO3 crystallization unit (Evaporative crystallization (LPS heated))</td><td class='num'>$2,295,249</td><td class='small'></td></tr><tr><td style='padding-left:20px;color:var(--muted)'><i>K2CO3 crystallization subtotal</i></td><td class='num' style='color:var(--muted)'><i>$2,295,249</i></td><td></td></tr><tr style='background:var(--border)'><td colspan='3'><b>H2O2 polishing</b></td></tr><tr><td style='padding-left:20px'>H2O2 polishing unit (Distillation (cathode side))</td><td class='num'>$3,825,415</td><td class='small'></td></tr><tr><td style='padding-left:20px;color:var(--muted)'><i>H2O2 polishing subtotal</i></td><td class='num' style='color:var(--muted)'><i>$3,825,415</i></td><td></td></tr><tr style='background:var(--border)'><td colspan='3'><b>Gas recycle (CO/O2)</b></td></tr><tr><td style='padding-left:20px'>Gas recycle (CO/O2) unit (PSA / membrane)</td><td class='num'>$2,677,791</td><td class='small'></td></tr><tr><td style='padding-left:20px;color:var(--muted)'><i>Gas recycle (CO/O2) subtotal</i></td><td class='num' style='color:var(--muted)'><i>$2,677,791</i></td><td></td></tr><tr><td><b>ISBL (inside battery limits)</b></td><td class='num'><b>$9,520,668</b></td><td></td></tr><tr><td>OSBL (25% of ISBL)</td><td class='num'>$2,380,167</td><td class='small'>standard factor</td></tr><tr><td><b>Total installed CAPEX</b></td><td class='num'><b>$11,900,835</b></td><td class='small'>× CRF 0.0806 → $0.96 M/y annualized</td></tr></table><p class='small' style='color:var(--muted);margin-top:8px'>Installed cost scales from the reference quote by the 0.6 power law × CEPCI(2023). Equipment quotes are from the source paper TEA basis unless a source is shown. Annualized via CRF = 0.0806 (7%, 30 y).</p></div>
+
+  <div class='card'><h2>🧾 OPEX breakdown (every line @ 10 t/batch)</h2><table><tr><th>Line item</th><th class='num'>$/year</th></tr><tr><td style='padding-left:22px'>Feedstock - LDG gas (CO surrogate)</td><td class='num'>$0</td></tr><tr><td style='padding-left:22px'>Feedstock - O2 makeup</td><td class='num'>$176,204</td></tr><tr><td style='padding-left:22px'>Feedstock - KOH makeup</td><td class='num'>$244,061</td></tr><tr><td style='padding-left:22px'>Feedstock - H2O makeup</td><td class='num'>$1,884</td></tr><tr><td style='padding-left:6px'><i>Feedstock Total</i></td><td class='num'><i>$422,149</i></td></tr><tr><td style='padding-left:22px'>Utility - Electricity</td><td class='num'>$117</td></tr><tr><td style='padding-left:22px'>Utility - Lps Steam</td><td class='num'>$47</td></tr><tr><td style='padding-left:6px'><i>Utility Total</i></td><td class='num'><i>$164</i></td></tr><tr><td style='padding-left:22px'>Maintenance (% of CAPEX)</td><td class='num'>$1,190,084</td></tr><tr><td style='padding-left:22px'>Operation (% of CAPEX)</td><td class='num'>$1,190,084</td></tr><tr><td style='padding-left:6px'><i>Operation Total</i></td><td class='num'><i>$2,380,167</i></td></tr><tr style='border-top:2px solid var(--accent)'><td><b>OPEX total</b></td><td class='num'><b>$2,802,479/y</b></td></tr></table><p class='small' style='color:var(--muted);margin-top:8px'>Feedstock = makeup × price (recovered fractions excluded). Utility = energy coefficients × throughput. Maintenance + operation per the assumptions table. Component prices &amp; their sources are listed in the price-references card below.</p></div>
+
+  <div class="card">
+    <h2>📈 Scale-up ladder</h2>
+    <table>
+      <tr><th>Stage</th><th class="num">t/batch</th>
+          <th class="num">CAPEX ($M)</th><th class="num">OPEX ($M/y)</th>
+          <th class="num">Revenue ($M/y)</th><th class="num">Net profit ($M/y)</th>
+          <th class="num">MSP H2O2 ($/kg)</th></tr>
+      <tr><td>Lab</td><td class='num'>0.001</td><td class='num'>0.07</td><td class='num'>0.01</td><td class='num'>0.00</td><td class='num'>-0.02</td><td class='num'>136.65</td></tr><tr><td>Bench</td><td class='num'>0.01</td><td class='num'>0.21</td><td class='num'>0.04</td><td class='num'>0.01</td><td class='num'>-0.05</td><td class='num'>39.17</td></tr><tr><td>Pilot</td><td class='num'>0.1</td><td class='num'>0.77</td><td class='num'>0.16</td><td class='num'>0.07</td><td class='num'>-0.15</td><td class='num'>11.96</td></tr><tr><td>Demo</td><td class='num'>1</td><td class='num'>3.00</td><td class='num'>0.64</td><td class='num'>0.66</td><td class='num'>-0.23</td><td class='num'>2.29</td></tr><tr><td>Commercial</td><td class='num'>10</td><td class='num'>11.90</td><td class='num'>2.80</td><td class='num'>6.55</td><td class='num'>2.79</td><td class='num'>-1.44</td></tr>
+    </table>
+    <p><b>Recommendation:</b> Largest profitable stage: **Commercial** (10 ton/batch), net profit $2.79 M/y, MSP $-1.44/kg. Scale up with stage gates at each ladder rung.</p>
+  </div>
+
+  <div class='card'><h2>📉 Sensitivity sweeps</h2><div class='chart-grid'><div class='chart-box'><h3>O2 recovery → MSP</h3><canvas id='chart_O2_recovery___MSP'></canvas></div><div class='chart-box'><h3>KOH price → MSP</h3><canvas id='chart_KOH_price___MSP'></canvas></div></div></div>
+
+  <div class='card'><h2>⚠️ Scale-up risks</h2><details class='risks' open><summary>Generic (5)</summary><ul><li>Electrode area scales linearly with current — capex of the cell stack dominates and does NOT follow the 6/10 rule.</li><li>Gas management: H2/O2 evolution rates scale linearly; explosion-proof venting and gas-liquid disengagement become mandatory above pilot.</li><li>Membrane lifetime (Nafion/PEM): expect 5-7 y replacement; build into OPEX as a periodic stream.</li><li>Current distribution uniformity is hard above ~1 m² electrode — split into multiple cells in series rather than one giant cell.</li><li>Electrolyte purification / makeup gets expensive at commercial scale; consider in-loop ion-exchange.</li></ul></details><details class='risks'><summary>Downstream (4)</summary><ul><li>Distillation: reflux ratio + tray count must be set from VLE data, not lab approximation; capex follows ~0.65 scaling.</li><li>Extraction: solvent recovery loop is essential — virgin solvent OPEX kills the economics if recovery &lt; 95%.</li><li>Crystallisation: scale-up to &gt;1 ton requires a defined cooling profile (PAT/seeding) to avoid agglomeration.</li><li>Membrane separation: flux declines with feed concentration; fouling cleaning cycle = OPEX line.</li></ul></details><details class='risks'><summary>EHS / safety (2)</summary><ul><li>H2 is highly flammable, LEL 4 vol-%; ventilation + leak monitoring + ATEX.</li><li>Caustic: thermal hazard on dilution; CRZ on transfer lines.</li></ul></details></div>
+
+  <div class="card">
+    <h2>📦 Streams & makeup (per batch)</h2>
+    <p class="small" style="color:var(--muted);margin-top:-2px">
+      The PFD shows ONE arrow per reagent. The breakdown of how much is loaded
+      once (initial charge) vs replenished continuously (makeup at the drag-out
+      rate) is here.
+    </p>
+    <table>
+      <tr><th>Stream</th><th>Role</th><th class="num">g/batch</th>
+          <th class="num">Recovery</th><th>Behaviour</th></tr>
+      <tr><td>LDG gas (CO surrogate)</td><td>input</td><td class='num'>3.27</td><td class='num'>0.00</td><td>continuous (single-pass)</td></tr><tr><td>O2</td><td>input</td><td class='num'>64.3</td><td class='num'>0.99</td><td>continuous: initial charge + 1.0% / batch makeup (recovery 99%)</td></tr><tr><td>KOH</td><td>input</td><td class='num'>5</td><td class='num'>0.99</td><td>continuous: initial charge + 1.0% / batch makeup (recovery 99%)</td></tr><tr><td>H2O</td><td>input</td><td class='num'>100</td><td class='num'>0.99</td><td>continuous: initial charge + 1.0% / batch makeup (recovery 99%)</td></tr><tr><td>H2O2</td><td>output</td><td class='num'>0.159249</td><td class='num'>—</td><td>product</td></tr><tr><td>K2CO3</td><td>output</td><td class='num'>0.7521</td><td class='num'>—</td><td>product</td></tr>
+    </table>
+  </div>
+
+  <div class='card'><h2>📚 Chemical price references</h2><table><tr><th>Component</th><th class='num'>Active $/kg</th><th>Active source</th><th>Other sources on file</th></tr><tr><td>H2O</td><td class='num'>$0.00</td><td>Nat Commun 2021</td><td class='small' style='color:var(--muted)'></td></tr><tr><td>H2O2</td><td class='num'>$0.60</td><td>Echemi 2025</td><td class='small' style='color:var(--muted)'>Echemi 2024 $0.44; Echemi 2023 $0.46; Nat Commun 2024 2024 $1.09; Echemi 100 wt% basis 2025 $1.50; 260506 TEA workbook ref 2026 $1.20</td></tr><tr><td>K2CO3</td><td class='num'>$0.89</td><td>Echemi 2025</td><td class='small' style='color:var(--muted)'>Echemi 2024 $0.95; Echemi 2023 $1.18; Sigma reagent grade 2024 $247.00</td></tr><tr><td>KOH</td><td class='num'>$0.57</td><td>Echemi 2025</td><td class='small' style='color:var(--muted)'>Echemi 2024 $0.64; Echemi 2023 $0.81; Sigma reagent grade 2024 $111.00</td></tr><tr><td>LDG gas (CO surrogate)</td><td class='num'>$0.00</td><td>lignin depolymerization off-gas (waste)</td><td class='small' style='color:var(--muted)'></td></tr><tr><td>O2</td><td class='num'>$0.03</td><td>260506 TEA workbook 2026</td><td class='small' style='color:var(--muted)'>Nat Commun 2024 SI 2024 $0.09; imarcgroup oxygen report 2024 $0.11; Echemi 2025 $0.56; Echemi 2024 $1.19; Echemi 2023 $0.79</td></tr></table></div>
+
+  <div class="card">
+    <h2>🛠️ Equipment</h2>
+    <table>
+      <tr><th>Section</th><th>Equipment</th><th class="num">Base cost ($)</th>
+          <th>Source</th><th>Lifetime</th></tr>
+      <tr><td>Feedstock Pretreatment</td><td>Pretreatment Mill / Mixer</td><td class='num'>$120,000</td><td>default</td><td>permanent</td></tr><tr><td>Reaction
+25 °C · 3 h · 1 V · 95 mA/cm² · FE 73.1%</td><td>Electrolyzer cell housing</td><td class='num'>$10,000</td><td>260506 COOR-ORR TEA workbook</td><td>30 y</td></tr><tr><td>Reaction
+25 °C · 3 h · 1 V · 95 mA/cm² · FE 73.1%</td><td>Electrode pair</td><td class='num'>$964</td><td>260506 COOR-ORR TEA workbook</td><td>5 y</td></tr><tr><td>Reaction
+25 °C · 3 h · 1 V · 95 mA/cm² · FE 73.1%</td><td>Nafion 117 membrane</td><td class='num'>$180</td><td>Chemours catalog</td><td>5 y</td></tr><tr><td>Reaction
+25 °C · 3 h · 1 V · 95 mA/cm² · FE 73.1%</td><td>Balance of plant (BoP)</td><td class='num'>$3,500</td><td>industry standard 35% factor</td><td>30 y</td></tr><tr><td>K2CO3 crystallization</td><td>K2CO3 crystallization unit (Evaporative crystallization (LPS heated))</td><td class='num'>$300,000</td><td>default</td><td>permanent</td></tr><tr><td>H2O2 polishing</td><td>H2O2 polishing unit (Distillation (cathode side))</td><td class='num'>$500,000</td><td>default</td><td>permanent</td></tr><tr><td>Gas recycle (CO/O2)</td><td>Gas recycle (CO/O2) unit (PSA / membrane)</td><td class='num'>$350,000</td><td>default</td><td>permanent</td></tr>
+    </table>
+  </div>
+
+  <div class='card'><h2>📚 Assumptions &amp; References</h2><p class='small' style='color:var(--muted)'>This process is still on schema v1 — prices and assumptions are not yet linked to citations. Run <code>python -m tea_engine.validate_cli</code> to see the coverage report, and migrate to schema v2 (see the Oh-2026 PET exemplar) to populate this section.</p></div>
+
+</div>
+
+<footer>
+  Generated by tea_tool · 2026-05-29 16:40<br>
+  Diagrams &amp; charts load from the local <code>vendor/</code> folder (works
+  offline); if this file is moved on its own, they fall back to a CDN.
+</footer>
+
+<script>
+  // ---------- theme ----------
+  function toggleTheme() {
+    const cur = document.documentElement.getAttribute("data-theme");
+    const next = (cur === "dark") ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    localStorage.setItem("tea-theme", next);
+    location.reload();
+  }
+  const saved = localStorage.getItem("tea-theme");
+  if (saved) document.documentElement.setAttribute("data-theme", saved);
+
+  // ---------- robust loader: local vendor first, CDN fallback ----------
+  function loadScript(local, cdn, cb) {
+    var s = document.createElement("script");
+    s.src = local;
+    s.onload = cb;
+    s.onerror = function () {
+      var c = document.createElement("script");
+      c.src = cdn; c.onload = cb;
+      c.onerror = function () { console.warn("tea_tool: could not load " + local + " (and CDN failed)"); };
+      document.head.appendChild(c);
+    };
+    document.head.appendChild(s);
+  }
+
+  // ---------- PFD zoom / fit (independent of mermaid loading) ----------
+  function setScale(s) {
+    const svg = document.querySelector("#pfd-host svg");
+    if (!svg) return;
+    document.documentElement.style.setProperty("--pfd-scale", String(s));
+    const host = document.getElementById("pfd-host");
+    host.scrollLeft = host.scrollLeft;
+  }
+  function currentScale() {
+    return parseFloat(
+      getComputedStyle(document.documentElement).getPropertyValue("--pfd-scale") || 1
+    ) || 1;
+  }
+  function fitToWidth() {
+    const svg = document.querySelector("#pfd-host svg");
+    const host = document.getElementById("pfd-host");
+    if (!svg || !host) return;
+    const vb = (svg.getAttribute("viewBox") || "").split(/\s+/).map(Number);
+    const nat = (vb.length === 4 && vb[2]) ? vb[2] : svg.clientWidth;
+    if (!nat) return;
+    const fit = (host.clientWidth - 20) / nat;
+    setScale(Math.max(0.2, Math.min(3, fit)));
+  }
+  window.addEventListener("resize", () => setTimeout(fitToWidth, 100));
+  window.pfdZoom = (factor) => setScale(currentScale() * factor);
+  window.pfdReset = () => fitToWidth();
+  window.pfdFullscreen = () => {
+    const card = document.getElementById("pfd-card");
+    card.classList.toggle("pfd-fullscreen");
+    setTimeout(fitToWidth, 200);
+  };
+
+  // ---------- mermaid (called once mermaid.min.js has loaded) ----------
+  function pickMermaidTheme() {
+    const t = document.documentElement.getAttribute("data-theme");
+    if (t === "dark") return "dark";
+    if (t === "light") return "default";
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "default";
+  }
+  function initMermaid() {
+    if (!window.mermaid) return;
+    try {
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: pickMermaidTheme(),
+        securityLevel: "loose",
+        flowchart: { htmlLabels: true, curve: "basis", nodeSpacing: 50,
+                     rankSpacing: 80, padding: 14, useMaxWidth: false },
+        themeVariables: { fontSize: "15px" }
+      });
+      var p = mermaid.run ? mermaid.run({ querySelector: ".mermaid" }) : null;
+      if (p && p.then) p.then(() => setTimeout(fitToWidth, 300));
+      else setTimeout(fitToWidth, 500);
+    } catch (e) { try { mermaid.init(); setTimeout(fitToWidth, 500); } catch (e2) {} }
+  }
+
+  // ---------- charts (called once chart.umd.min.js has loaded) ----------
+  const SENSITIVITY_DATA = {"O2 recovery \u2192 MSP": [[0.999, -1.5611096118864705], [0.99, -1.4448237953350316], [0.95, -0.9279979439953056], [0.9, -0.28196562982064927]], "KOH price \u2192 MSP": [[1.14, -1.2658587782862591], [0.855, -1.3553412868106456], [0.57, -1.4448237953350316], [0.285, -1.534306303859418]]};
+  function initCharts() {
+    if (!window.Chart) return;
+    const txt = getComputedStyle(document.documentElement).getPropertyValue("--fg").trim();
+    const acc = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim();
+    for (const [title, points] of Object.entries(SENSITIVITY_DATA)) {
+      const id = "chart_" + title.replace(/[^a-zA-Z0-9]/g, "_");
+      const el = document.getElementById(id);
+      if (!el) continue;
+      new Chart(el, {
+        type: "line",
+        data: { labels: points.map(p => p[0]),
+          datasets: [{ label: "MSP ($/kg)", data: points.map(p => p[1]),
+            borderColor: acc, backgroundColor: acc + "33", tension: 0.3, pointRadius: 5 }] },
+        options: { responsive: true, maintainAspectRatio: false,
+          scales: { x: { ticks: { color: txt } },
+                    y: { ticks: { color: txt }, title: { display: true, text: "MSP ($/kg)", color: txt } } },
+          plugins: { legend: { display: false } } }
+      });
+    }
+  }
+
+  // ---------- kick off (local-first, CDN fallback) ----------
+  loadScript("vendor/mermaid.min.js",
+             "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js", initMermaid);
+  loadScript("vendor/chart.umd.min.js",
+             "https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js", initCharts);
+</script>
+</body>
+</html>

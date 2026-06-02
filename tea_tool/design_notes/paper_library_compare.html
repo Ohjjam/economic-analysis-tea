@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8" />
+<title>Scenario comparison</title>
+<style>
+  :root, html[data-theme="light"] { --bg:#fafafa; --fg:#111; --muted:#555;
+    --accent:#1565C0; --card:#fff; --border:#e0e0e0; }
+  html[data-theme="dark"] { --bg:#1a1a1a; --fg:#eee; --muted:#aaa;
+    --accent:#64B5F6; --card:#232323; --border:#333; }
+  @media (prefers-color-scheme: dark) {
+    html[data-theme="auto"] { --bg:#1a1a1a; --fg:#eee; --muted:#aaa;
+      --accent:#64B5F6; --card:#232323; --border:#333; }
+  }
+  body { background: var(--bg); color: var(--fg); margin: 0;
+          font: 14px/1.5 -apple-system, "Segoe UI", Roboto, Helvetica, Arial; }
+  .container { max-width: 1400px; margin: 0 auto; padding: 28px; }
+  h1 { margin: 0 0 18px 0; }
+  .card { background: var(--card); border: 1px solid var(--border);
+           border-radius: 8px; padding: 18px 22px; margin-bottom: 18px; }
+  h2 { margin-top: 0; font-size: 16px; color: var(--accent);
+        border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 8px 10px;
+            border-bottom: 1px solid var(--border); }
+  th { font-size: 12px; color: var(--muted); text-transform: uppercase;
+        letter-spacing: 0.04em; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .winner { color: #2E7D32; font-weight: 600; }
+  .loser  { color: #C62828; }
+  canvas { max-height: 320px; }
+  .theme-toggle { position: fixed; top: 14px; right: 16px;
+                   background: var(--card); color: var(--fg);
+                   border: 1px solid var(--border); border-radius: 6px;
+                   padding: 6px 12px; font-size: 13px; cursor: pointer; }
+</style>
+</head>
+<body>
+<button class="theme-toggle" onclick="toggleTheme()">🌓 theme</button>
+<div class="container">
+  <h1>Scenario comparison</h1>
+
+  <div class="card">
+    <h2>Summary</h2>
+    <table>
+      <tr><th>Scenario</th><th>MSP product</th><th class="num">Scale (t)</th>
+          <th class="num">CAPEX ($M)</th><th class="num">OPEX ($M/y)</th>
+          <th class="num">Revenue ($M/y)</th><th class="num">Net ($M/y)</th>
+          <th class="num">MSP ($/kg)</th><th>Detail</th></tr>
+      <tr><td>Bagemihl 2023 — CO2 -&gt; Ethylene (Cu-GDE)</td><td>C2H4</td><td class='num'>10</td><td class='num'>6.16</td><td class='num'>6.28</td><td class='num'>51.90</td><td class='num'>44.89</td><td class='num '>$0.12</td><td><a href='paper_bagemihl_2023_ethylene.html'>open</a></td></tr>
+      <tr><td>HAT-mediated electrocatalytic lignin valorization </td><td>Vanillin</td><td class='num'>10</td><td class='num'>15.25</td><td class='num'>12.19</td><td class='num'>15.93</td><td class='num'>1.95</td><td class='num '>$13.15</td><td><a href='paper_blanc_2024_lignin_hat.html'>open</a></td></tr>
+      <tr><td>Glycerol -&gt; formic acid (industrial-level EO)</td><td>FA</td><td class='num'>10</td><td class='num'>12.84</td><td class='num'>11.15</td><td class='num'>82.53</td><td class='num'>70.07</td><td class='num '>$0.05</td><td><a href='paper_glycerol_formic.html'>open</a></td></tr>
+      <tr><td>HMF -&gt; FDCA (Ni/NiOOH foam, electrochemical)</td><td>FDCA</td><td class='num'>10</td><td class='num'>7.59</td><td class='num'>102.65</td><td class='num'>145.87</td><td class='num'>42.45</td><td class='num '>$2.83</td><td><a href='paper_hmf_to_fdca.html'>open</a></td></tr>
+      <tr><td>Li 2025 — Water spillover 2e-ORR</td><td>H2O2</td><td class='num'>10</td><td class='num'>5.67</td><td class='num'>2.87</td><td class='num'>2.10</td><td class='num'>-1.36</td><td class='num '>$0.99</td><td><a href='paper_li_2025_h2o2_spillover.html'>open</a></td></tr>
+      <tr><td>Liu 2020 — Glucose -&gt; glucaric acid + H2 (NiFe)</td><td>Glucaric acid</td><td class='num'>10</td><td class='num'>8.07</td><td class='num'>18.00</td><td class='num'>181.82</td><td class='num'>163.00</td><td class='num '>$0.53</td><td><a href='paper_liu_2020_glucose_glucaric.html'>open</a></td></tr>
+      <tr><td>Mosalpuri 2023 — Nitrate -&gt; Hydroxylamine</td><td>NH2OH</td><td class='num'>10</td><td class='num'>13.35</td><td class='num'>22.59</td><td class='num'>26.35</td><td class='num'>2.19</td><td class='num '>$1.58</td><td><a href='paper_mosalpuri_2023_nh2oh.html'>open</a></td></tr>
+      <tr><td>Na 2019 — CO2RR-OOR (CO + 2-furoic acid)</td><td>FuroicAcid</td><td class='num'>10</td><td class='num'>12.37</td><td class='num'>11.12</td><td class='num'>702.39</td><td class='num'>689.65</td><td class='num '>$-2.96</td><td><a href='paper_na_2019_co2rr_oor.html'>open</a></td></tr>
+      <tr><td>Nie 2025 — Ampere-level H2O2 in seawater (Ni(OH)2/</td><td>H2O2</td><td class='num'>10</td><td class='num'>4.23</td><td class='num'>3.58</td><td class='num'>2.42</td><td class='num'>-1.59</td><td class='num '>$0.99</td><td><a href='paper_nie_2025_h2o2_seawater.html'>open</a></td></tr>
+      <tr><td>Oh 2026 — Mild PET hydrolysis (PMA + EC)</td><td>TPA</td><td class='num'>10</td><td class='num'>18.54</td><td class='num'>10.23</td><td class='num'>53.86</td><td class='num'>41.67</td><td class='num '>$-0.25</td><td><a href='paper_oh_2026_pet_pma.html'>open</a></td></tr>
+      <tr><td>Qi 2023 — H2O2 + PET upcycling (Ni-Mn)</td><td>H2O2</td><td class='num'>10</td><td class='num'>11.41</td><td class='num'>11.45</td><td class='num'>24.95</td><td class='num'>12.34</td><td class='num '>$-0.25</td><td><a href='paper_qi_2023_h2o2_pet.html'>open</a></td></tr>
+      <tr><td>Shin 2021 — CO2 -&gt; HCOOH (BPM MEA)</td><td>HCOOH</td><td class='num'>50</td><td class='num'>28.71</td><td class='num'>18.44</td><td class='num'>356.33</td><td class='num'>334.97</td><td class='num '>$0.00</td><td><a href='paper_shin_2021_hcooh.html'>open</a></td></tr>
+      <tr><td>Sun 2024 — Dual-pathway H2O2 (2e-ORR + 2e-WOR)</td><td>H2O2</td><td class='num'>10</td><td class='num'>5.67</td><td class='num'>3.75</td><td class='num'>4.11</td><td class='num'>-0.22</td><td class='num '>$0.63</td><td><a href='paper_sun_2024_h2o2_dualpath.html'>open</a></td></tr>
+      <tr><td>Sun 2024 — paired H2O2 + glycolic acid (Ni-SAC + E</td><td>H2O2</td><td class='num'>10</td><td class='num'>8.54</td><td class='num'>34.59</td><td class='num'>46.39</td><td class='num'>10.79</td><td class='num winner'>$-4.55</td><td><a href='paper_sun_2024_h2o2_eg.html'>open</a></td></tr>
+      <tr><td>Wang 2025 — Laser Ni-C GDE for industrial H2O2</td><td>H2O2</td><td class='num'>10</td><td class='num'>4.23</td><td class='num'>3.56</td><td class='num'>2.27</td><td class='num'>-1.72</td><td class='num '>$1.06</td><td><a href='paper_wang_2025_h2o2_gde.html'>open</a></td></tr>
+      <tr><td>Yim/Oh 2022 — Option A (H2 as MSP product)</td><td>H2</td><td class='num'>10</td><td class='num'>12.93</td><td class='num'>123.29</td><td class='num'>2.47</td><td class='num'>-122.34</td><td class='num '>$413.21</td><td><a href='paper_yim_2022_A_h2_msp.html'>open</a></td></tr>
+      <tr><td>Yim/Oh 2022 — Option C (2-MeTHF instead of CHCl3)</td><td>H2</td><td class='num'>10</td><td class='num'>16.53</td><td class='num'>128.07</td><td class='num'>2.47</td><td class='num'>-127.54</td><td class='num '>$430.69</td><td><a href='paper_yim_2022_C_metHF.html'>open</a></td></tr>
+      <tr><td>Yim/Oh 2022 — Modular flow lignin -&gt; aromatics + l</td><td>Vanillin</td><td class='num'>10</td><td class='num'>12.93</td><td class='num'>123.29</td><td class='num'>1.92</td><td class='num'>-122.89</td><td class='num '>$1830.71</td><td><a href='paper_yim_2022_modular_flow_lignin.html'>open</a></td></tr>
+      <tr><td>COOR-ORR paired electrolysis (1V pulse, LDG feed)</td><td>H2O2</td><td class='num'>10</td><td class='num'>11.90</td><td class='num'>2.81</td><td class='num'>6.55</td><td class='num'>2.79</td><td class='num '>$-1.44</td><td><a href='coor_orr_sys1_pulse.html'>open</a></td></tr>
+      <tr><td>OER-ORR baseline (1.5V continuous)</td><td>H2O2</td><td class='num'>10</td><td class='num'>5.68</td><td class='num'>2.52</td><td class='num'>0.07</td><td class='num'>-2.90</td><td class='num '>$24.41</td><td><a href='coor_orr_sys2_oer.html'>open</a></td></tr>
+      <tr><td>Galvanic COOR-ORR (0V, LDG + air)</td><td>H2O2</td><td class='num'>10</td><td class='num'>8.79</td><td class='num'>1.76</td><td class='num'>0.06</td><td class='num'>-2.41</td><td class='num '>$213.33</td><td><a href='coor_orr_sys3_galvanic.html'>open</a></td></tr>
+      <tr><td>COOR-ORR with pure CO feed (1V pulse)</td><td>H2O2</td><td class='num'>10</td><td class='num'>8.55</td><td class='num'>161.19</td><td class='num'>6.55</td><td class='num'>-155.33</td><td class='num '>$114.50</td><td><a href='coor_orr_sys4_pureCO.html'>open</a></td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>MSP across scenarios</h2>
+    <canvas id="cmp_msp"></canvas>
+  </div>
+
+  <div class="card">
+    <h2>CAPEX vs OPEX vs Revenue</h2>
+    <canvas id="cmp_stack"></canvas>
+  </div>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script>
+  function toggleTheme() {
+    const cur = document.documentElement.getAttribute("data-theme");
+    document.documentElement.setAttribute("data-theme",
+      cur === "dark" ? "light" : "dark");
+    localStorage.setItem("tea-theme",
+      document.documentElement.getAttribute("data-theme"));
+    location.reload();
+  }
+  const saved = localStorage.getItem("tea-theme");
+  if (saved) document.documentElement.setAttribute("data-theme", saved);
+
+  const DATA = [{"label": "Bagemihl 2023 \u2014 CO2 -> Ethylene (Cu-GDE)", "msp_product": "C2H4", "scale_t": 10.0, "capex_total_m": 6.161713537969953, "capex_ann_m": 0.7239989257599937, "opex_m": 6.282617247044411, "rev_m": 51.89900544, "net_m": 44.8923892671956, "msp": 0.11690032781978019, "html_path": "paper_bagemihl_2023_ethylene.html"}, {"label": "HAT-mediated electrocatalytic lignin valorization ", "msp_product": "Vanillin", "scale_t": 10.0, "capex_total_m": 15.251819627175507, "capex_ann_m": 1.7917809675492435, "opex_m": 12.18873598654007, "rev_m": 15.92568, "net_m": 1.9451630459106863, "msp": 13.149578533189986, "html_path": "paper_blanc_2024_lignin_hat.html"}, {"label": "Glycerol -> formic acid (industrial-level EO)", "msp_product": "FA", "scale_t": 10.0, "capex_total_m": 12.839583239062206, "capex_ann_m": 1.3077711859161727, "opex_m": 11.148211237579439, "rev_m": 82.52620800000001, "net_m": 70.07022557650441, "msp": 0.04959642309969419, "html_path": "paper_glycerol_formic.html"}, {"label": "HMF -> FDCA (Ni/NiOOH foam, electrochemical)", "msp_product": "FDCA", "scale_t": 10.0, "capex_total_m": 7.593081021462934, "capex_ann_m": 0.7735805581357105, "opex_m": 102.65079951699589, "rev_m": 145.87152, "net_m": 42.4471399248684, "msp": 2.8295739327623255, "html_path": "paper_hmf_to_fdca.html"}, {"label": "Li 2025 \u2014 Water spillover 2e-ORR", "msp_product": "H2O2", "scale_t": 10.0, "capex_total_m": 5.670883680972291, "capex_ann_m": 0.5776754226168132, "opex_m": 2.8742064243190866, "rev_m": 2.095392, "net_m": -1.3564898469359, "msp": 0.9884208339831115, "html_path": "paper_li_2025_h2o2_spillover.html"}, {"label": "Liu 2020 \u2014 Glucose -> glucaric acid + H2 (NiFe)", "msp_product": "Glucaric acid", "scale_t": 10.0, "capex_total_m": 8.074421165960596, "capex_ann_m": 0.8226478119133649, "opex_m": 17.995529296971952, "rev_m": 181.815552, "net_m": 162.99737489111467, "msp": 0.526504382894452, "html_path": "paper_liu_2020_glucose_glucaric.html"}, {"label": "Mosalpuri 2023 \u2014 Nitrate -> Hydroxylamine", "msp_product": "NH2OH", "scale_t": 10.0, "capex_total_m": 13.353346567934864, "capex_ann_m": 1.5689718085956463, "opex_m": 22.586003638063033, "rev_m": 26.346120480000003, "net_m": 2.191145033341326, "msp": 1.5756244089069873, "html_path": "paper_mosalpuri_2023_nh2oh.html"}, {"label": "Na 2019 \u2014 CO2RR-OOR (CO + 2-furoic acid)", "msp_product": "FuroicAcid", "scale_t": 10.0, "capex_total_m": 12.368523616439544, "capex_ann_m": 1.6262479004982042, "opex_m": 11.118099188115202, "rev_m": 702.3930936000002, "net_m": 689.6487465113868, "msp": -2.9638891161260656, "html_path": "paper_na_2019_co2rr_oor.html"}, {"label": "Nie 2025 \u2014 Ampere-level H2O2 in seawater (Ni(OH)2/", "msp_product": "H2O2", "scale_t": 10.0, "capex_total_m": 4.231924427479309, "capex_ann_m": 0.43105586863060247, "opex_m": 3.579427784805857, "rev_m": 2.4219648, "net_m": -1.5885188534364598, "msp": 0.9935281437871747, "html_path": "paper_nie_2025_h2o2_seawater.html"}, {"label": "Oh 2026 \u2014 Mild PET hydrolysis (PMA + EC)", "msp_product": "TPA", "scale_t": 10.0, "capex_total_m": 18.538550855909318, "capex_ann_m": 1.9665555384880833, "opex_m": 10.231511219175337, "rev_m": 53.864364, "net_m": 41.666297242336576, "msp": -0.2505949000844829, "html_path": "paper_oh_2026_pet_pma.html"}, {"label": "Qi 2023 \u2014 H2O2 + PET upcycling (Ni-Mn)", "msp_product": "H2O2", "scale_t": 10.0, "capex_total_m": 11.40742494619422, "capex_ann_m": 1.1619339730521607, "opex_m": 11.450278059298448, "rev_m": 24.9512832, "net_m": 12.33907116764939, "msp": -0.25058560869354213, "html_path": "paper_qi_2023_h2o2_pet.html"}, {"label": "Shin 2021 \u2014 CO2 -> HCOOH (BPM MEA)", "msp_product": "HCOOH", "scale_t": 50.0, "capex_total_m": 28.712490784306596, "capex_ann_m": 2.9246807883878616, "opex_m": 18.435188541970803, "rev_m": 356.33157120000004, "net_m": 334.9717018696414, "msp": 0.003191991591339251, "html_path": "paper_shin_2021_hcooh.html"}, {"label": "Sun 2024 \u2014 Dual-pathway H2O2 (2e-ORR + 2e-WOR)", "msp_product": "H2O2", "scale_t": 10.0, "capex_total_m": 5.672148975972291, "capex_ann_m": 0.5778209744535013, "opex_m": 3.7493961133857883, "rev_m": 4.1101920000000005, "net_m": -0.21702508783928864, "msp": 0.6316810145860761, "html_path": "paper_sun_2024_h2o2_dualpath.html"}, {"label": "Sun 2024 \u2014 paired H2O2 + glycolic acid (Ni-SAC + E", "msp_product": "H2O2", "scale_t": 10.0, "capex_total_m": 8.543108360458257, "capex_ann_m": 1.003593485227689, "opex_m": 34.593925306783035, "rev_m": 46.38875520000002, "net_m": 10.791236407989294, "msp": -4.5499845413122175, "html_path": "paper_sun_2024_h2o2_eg.html"}, {"label": "Wang 2025 \u2014 Laser Ni-C GDE for industrial H2O2", "msp_product": "H2O2", "scale_t": 10.0, "capex_total_m": 4.233189722479308, "capex_ann_m": 0.43120142046729054, "opex_m": 3.5640108099394747, "rev_m": 2.2705919999999997, "net_m": -1.724620230406766, "msp": 1.0557279063099225, "html_path": "paper_wang_2025_h2o2_gde.html"}, {"label": "Yim/Oh 2022 \u2014 Option A (H2 as MSP product)", "msp_product": "H2", "scale_t": 10.0, "capex_total_m": 12.929793371912815, "capex_ann_m": 1.5199304614325386, "opex_m": 123.28880764797233, "rev_m": 2.4693283018867924, "net_m": -122.33940980751807, "msp": 413.2118670597703, "html_path": "paper_yim_2022_A_h2_msp.html"}, {"label": "Yim/Oh 2022 \u2014 Option C (2-MeTHF instead of CHCl3)", "msp_product": "H2", "scale_t": 10.0, "capex_total_m": 16.532663265421963, "capex_ann_m": 1.9431222072284253, "opex_m": 128.0663284534323, "rev_m": 2.4693283018867924, "net_m": -127.54012235877393, "msp": 430.69269945554413, "html_path": "paper_yim_2022_C_metHF.html"}, {"label": "Yim/Oh 2022 \u2014 Modular flow lignin -> aromatics + l", "msp_product": "Vanillin", "scale_t": 10.0, "capex_total_m": 12.929793371912815, "capex_ann_m": 1.5199304614325386, "opex_m": 123.28880764797233, "rev_m": 1.9152169811320754, "net_m": -122.89352112827278, "msp": 1830.71150355943, "html_path": "paper_yim_2022_modular_flow_lignin.html"}, {"label": "COOR-ORR paired electrolysis (1V pulse, LDG feed)", "msp_product": "H2O2", "scale_t": 10.0, "capex_total_m": 11.900835339047145, "capex_ann_m": 0.9593349180211689, "opex_m": 2.8050815317973368, "rev_m": 6.550414976, "net_m": 2.7859985261814937, "msp": -1.4429157774905217, "html_path": "coor_orr_sys1_pulse.html"}, {"label": "OER-ORR baseline (1.5V continuous)", "msp_product": "H2O2", "scale_t": 10.0, "capex_total_m": 5.681353157299724, "capex_ann_m": 0.45808311829403575, "opex_m": 2.5152970327331357, "rev_m": 0.073087308, "net_m": -2.900292843027171, "msp": 24.40954714895646, "html_path": "coor_orr_sys2_oer.html"}, {"label": "Galvanic COOR-ORR (0V, LDG + air)", "msp_product": "H2O2", "scale_t": 10.0, "capex_total_m": 8.786677647958257, "capex_ann_m": 0.7117524745397951, "opex_m": 1.7637528956108013, "rev_m": 0.0628802874, "net_m": -2.4126250827505964, "msp": 213.3322614079506, "html_path": "coor_orr_sys3_galvanic.html"}, {"label": "COOR-ORR with pure CO feed (1V pulse)", "msp_product": "H2O2", "scale_t": 10.0, "capex_total_m": 8.553596990063518, "capex_ann_m": 0.6895930177821088, "opex_m": 161.1915378620006, "rev_m": 6.550414976, "net_m": -155.3307159037827, "msp": 114.50083923829874, "html_path": "coor_orr_sys4_pureCO.html"}];
+  const txt = getComputedStyle(document.documentElement).getPropertyValue("--fg").trim();
+  const acc = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim();
+
+  new Chart(document.getElementById("cmp_msp"), {
+    type: "bar",
+    data: {
+      labels: DATA.map(s => s.label),
+      datasets: [{ label: "MSP ($/kg)",
+                    data: DATA.map(s => s.msp),
+                    backgroundColor: acc + "AA" }]
+    },
+    options: { scales: { y: { beginAtZero: true,
+                                ticks: { color: txt },
+                                title: { display: true, text: "MSP ($/kg)", color: txt } },
+                          x: { ticks: { color: txt } } },
+                 plugins: { legend: { display: false } } }
+  });
+
+  new Chart(document.getElementById("cmp_stack"), {
+    type: "bar",
+    data: {
+      labels: DATA.map(s => s.label),
+      datasets: [
+        { label: "Annualized CAPEX ($M/y)", data: DATA.map(s => s.capex_ann_m),
+           backgroundColor: "#37474F" },
+        { label: "OPEX ($M/y)", data: DATA.map(s => s.opex_m),
+           backgroundColor: "#90A4AE" },
+        { label: "Revenue ($M/y)", data: DATA.map(s => s.rev_m),
+           backgroundColor: "#43A047" }
+      ]
+    },
+    options: { scales: { y: { stacked: false, ticks: { color: txt } },
+                          x: { stacked: false, ticks: { color: txt } } } }
+  });
+</script>
+</body>
+</html>

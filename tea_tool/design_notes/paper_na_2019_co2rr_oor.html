@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>PFD — Na 2019 — CO2RR-OOR (CO + 2-furoic acid) (auto first-cut)</title>
+<style>
+  :root, html[data-theme="light"] {
+    --bg: #fafafa; --fg: #111; --muted: #555; --accent: #1565C0;
+    --card: #fff; --border: #e0e0e0;
+  }
+  html[data-theme="dark"] {
+    --bg: #1a1a1a; --fg: #eee; --muted: #aaa; --accent: #64B5F6;
+    --card: #232323; --border: #333;
+  }
+  @media (prefers-color-scheme: dark) {
+    html[data-theme="auto"] {
+      --bg: #1a1a1a; --fg: #eee; --muted: #aaa; --accent: #64B5F6;
+      --card: #232323; --border: #333;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--fg); margin: 0;
+          font: 14px/1.5 -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  header { padding: 20px 28px; border-bottom: 1px solid var(--border);
+            background: var(--card); }
+  h1 { margin: 0; font-size: 20px; font-weight: 600; }
+  h1 .small { color: var(--muted); font-weight: 400; font-size: 14px; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 24px 28px; }
+  .card { background: var(--card); border: 1px solid var(--border);
+           border-radius: 8px; padding: 18px 22px; margin-bottom: 18px; }
+  h2 { margin-top: 0; font-size: 16px; color: var(--accent);
+        border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+  .kv { display: grid; grid-template-columns: 200px 1fr; gap: 6px 18px; }
+  .kv dt { color: var(--muted); }
+  .kv dd { margin: 0; font-weight: 500; }
+  table { width: 100%; border-collapse: collapse; margin: 6px 0; }
+  th, td { text-align: left; padding: 6px 10px;
+            border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 500; font-size: 12px;
+        text-transform: uppercase; letter-spacing: 0.04em; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .pfd-wrap { background: var(--card); border-radius: 8px;
+               border: 1px solid var(--border); padding: 14px;
+               position: relative; }
+  .pfd-toolbar { position: absolute; top: 12px; right: 14px; z-index: 5;
+                   display: flex; gap: 6px; }
+  .pfd-toolbar button { background: var(--card); color: var(--fg);
+                          border: 1px solid var(--border); border-radius: 4px;
+                          padding: 4px 10px; font-size: 13px; cursor: pointer; }
+  .pfd-toolbar button:hover { background: var(--accent); color: white; }
+  .pfd { width: 100%; height: 75vh; min-height: 560px;
+          overflow: hidden; cursor: grab; }
+  .pfd:active { cursor: grabbing; }
+  .pfd svg { width: 100% !important; height: 100% !important;
+               max-width: none !important; }
+  .pfd .node text, .pfd .nodeLabel, .pfd .edgeLabel { font-size: 15px !important; }
+  .pfd-fullscreen { position: fixed; inset: 0; z-index: 1000;
+                      background: var(--bg); padding: 60px 24px 24px; }
+  .pfd-fullscreen .pfd { height: calc(100vh - 100px); }
+  details.risks { margin-top: 8px; }
+  details.risks summary { cursor: pointer; color: var(--accent);
+                           font-weight: 500; padding: 4px 0; }
+  details.risks ul { margin: 6px 0; padding-left: 24px; }
+  footer { color: var(--muted); font-size: 12px;
+            padding: 18px 28px; text-align: center; }
+  .badge { display: inline-block; padding: 2px 8px;
+            background: var(--accent); color: white; border-radius: 4px;
+            font-size: 11px; margin-left: 6px; }
+  .theme-toggle { position: fixed; top: 14px; right: 16px;
+                   background: var(--card); color: var(--fg);
+                   border: 1px solid var(--border); border-radius: 6px;
+                   padding: 6px 12px; font-size: 13px; cursor: pointer;
+                   z-index: 100; }
+  .theme-toggle:hover { background: var(--accent); color: white; }
+  .chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+                 gap: 16px; }
+  .chart-box { background: var(--card); border: 1px solid var(--border);
+                border-radius: 6px; padding: 10px 14px; }
+  .chart-box h3 { margin: 0 0 8px 0; font-size: 13px; color: var(--muted);
+                   font-weight: 500; }
+  canvas { max-height: 220px; }
+</style>
+</head>
+<body>
+<button class="theme-toggle" onclick="toggleTheme()">🌓 theme</button>
+<header>
+  <h1>Na 2019 — CO2RR-OOR (CO + 2-furoic acid) (auto first-cut) <span class="small">— Na, Seo, Brown et al. (Nat Commun)</span></h1>
+</header>
+<div class="container">
+
+  <div class="card pfd-wrap" id="pfd-card">
+    <h2>📐 Process Flow Diagram</h2>
+    <div class="pfd-toolbar">
+      <button onclick="pfdZoom(1.25)">🔍+</button>
+      <button onclick="pfdZoom(0.8)">🔍−</button>
+      <button onclick="pfdReset()">↺ reset</button>
+      <button onclick="pfdFullscreen()">⛶ full</button>
+    </div>
+    <div class="pfd" id="pfd-host">
+      <pre class="mermaid">
+flowchart LR
+    in_CO2(["CO2<br/>1.57 g"])
+    in_Furfural(["Furfural<br/>0.86 g"])
+    in_KHCO3(["KHCO3<br/>0.1 g"])
+    in_H2O(["H2O<br/>2.5 g"])
+    sec_pretreat["Feedstock Pretreatment"]
+    sec_rxn["Reaction<br/>25 °C · 1 h · 2.4 V · 200 mA/cm² · FE 85%"]
+    sec_sep1["Cathode gas-liquid separation"]
+    sec_sep2["Anode product extraction"]
+    sec_sep3["Furoic acid distillation"]
+    out_CO(["CO<br/>1.00009 g"])
+    out_FuroicAcid(["FuroicAcid<br/>1.82591 g"])
+    in_CO2 --> sec_pretreat
+    sec_pretreat -->|feed slurry| sec_rxn
+    sec_rxn -->|crude product| sec_sep2
+    sec_sep2 -->|biphasic mixture| sec_sep3
+    sec_sep3 -.->|recycle solvent| sec_sep2
+    in_Furfural --> sec_pretreat
+    in_KHCO3 -->|solvent reaction| sec_pretreat
+    in_H2O -->|utility| sec_pretreat
+    sec_sep3 -.->|recycle KHCO3 ❨90%❩| sec_pretreat
+    sec_sep1 --> out_CO
+    sec_sep3 --> out_FuroicAcid
+    classDef feed       fill:#FFE0B2,stroke:#E65100;
+    classDef prod       fill:#C8E6C9,stroke:#2E7D32;
+    classDef rxn        fill:#E1BEE7,stroke:#6A1B9A;
+    classDef catalyst   fill:#F8BBD0,stroke:#AD1457;
+    classDef solvent    fill:#B2DFDB,stroke:#00695C;
+    classDef acidbase   fill:#FFCDD2,stroke:#C62828;
+    classDef utility    fill:#CFD8DC,stroke:#455A64;
+    classDef consumable fill:#D1C4E9,stroke:#4527A0;
+    class in_H2O utility;
+    class in_KHCO3 solvent;
+    class in_CO2,in_Furfural feed;
+    class out_CO,out_FuroicAcid prod;
+    class sec_pretreat,sec_rxn,sec_sep1,sec_sep2,sec_sep3 rxn;
+      </pre>
+    </div>
+  </div>
+
+  <div class='card'><h2>⚙️ Operating conditions</h2><table><tr><th>Stage</th><th>Type</th><th>Conditions</th></tr><tr><td><b>Reaction</b></td><td>electrochemical</td><td>T = <b>25 °C</b> · P = 1 bar · τ = 1 h · V = <b>2.4 V</b> · j = <b>200 mA/cm²</b> · FE = 85%</td></tr></table></div>
+
+  <div class='card'><h2>⚡ Energy OPEX (annualised @ 10 t/batch)</h2><table><tr><th>Line item</th><th class='num'>$/year</th></tr><tr><td>  Utility - Electricity</td><td class='num'>$5,612/y</td></tr></table><p class='small' style='color:var(--muted);margin-top:8px'>Electricity and heat-duty OPEX are derived from the operating conditions above (V × j × area × t, or LPS kg / kg water for evaporation). If a line is missing, the auto-builder did not have enough info to compute it — refine the YAML or paper-grade builder.</p></div>
+
+  <div class="card">
+    <h2>📊 Topline TEA <span class="badge">at 10 t/batch</span></h2>
+    <dl class="kv">
+      <dt>CAPEX total</dt><dd>$12.37 M</dd>
+      <dt>CAPEX annualized</dt><dd>$1.63 M/y</dd>
+      <dt>OPEX</dt><dd>$11.12 M/y</dd>
+      <dt>Revenue total</dt><dd>$702.39 M/y</dd>
+      <dt>Net profit</dt><dd>$689.65 M/y</dd>
+      <dt>MSP (FuroicAcid)</dt><dd>$-2.96 /kg</dd>
+    </dl>
+  </div>
+
+  <div class='card'><h2>💰 Revenue breakdown @ 10 t/batch</h2><table><tr><th>Product</th><th class='num'>$M/y</th></tr><tr><td>CO</td><td class='num'>$269.41</td></tr><tr><td>FuroicAcid</td><td class='num'>$432.98</td></tr></table></div>
+
+  <div class="card">
+    <h2>📈 Scale-up ladder</h2>
+    <table>
+      <tr><th>Stage</th><th class="num">t/batch</th>
+          <th class="num">CAPEX ($M)</th><th class="num">OPEX ($M/y)</th>
+          <th class="num">Revenue ($M/y)</th><th class="num">Net ($M/y)</th>
+          <th class="num">MSP ($/kg)</th></tr>
+      <tr><td>Lab</td><td class='num'>0.001</td><td class='num'>0.06</td><td class='num'>0.01</td><td class='num'>0.07</td><td class='num'>0.05</td><td class='num'>-0.75</td></tr><tr><td>Bench</td><td class='num'>0.01</td><td class='num'>0.21</td><td class='num'>0.05</td><td class='num'>0.70</td><td class='num'>0.63</td><td class='num'>-2.22</td></tr><tr><td>Pilot</td><td class='num'>0.1</td><td class='num'>0.79</td><td class='num'>0.24</td><td class='num'>7.02</td><td class='num'>6.68</td><td class='num'>-2.71</td></tr><tr><td>Demo</td><td class='num'>1</td><td class='num'>3.11</td><td class='num'>1.49</td><td class='num'>70.24</td><td class='num'>68.34</td><td class='num'>-2.89</td></tr><tr><td>Commercial</td><td class='num'>10</td><td class='num'>12.37</td><td class='num'>11.12</td><td class='num'>702.39</td><td class='num'>689.65</td><td class='num'>-2.96</td></tr>
+    </table>
+    <p><b>Recommendation:</b> Largest profitable stage: **Commercial** (10 ton/batch), net profit $689.65 M/y, MSP $-2.96/kg. Scale up with stage gates at each ladder rung.</p>
+  </div>
+
+  <div class='card'><h2>📉 Sensitivity sweeps</h2><div class='chart-grid'><div class='chart-box'><h3>CO2 ($/kg)</h3><canvas id='chart_CO2____kg_'></canvas></div></div></div>
+
+  <div class='card'><h2>⚠️ Scale-up risks</h2><details class='risks' open><summary>Generic (5)</summary><ul><li>Electrode area scales linearly with current — capex of the cell stack dominates and does NOT follow the 6/10 rule.</li><li>Gas management: H2/O2 evolution rates scale linearly; explosion-proof venting and gas-liquid disengagement become mandatory above pilot.</li><li>Membrane lifetime (Nafion/PEM): expect 5-7 y replacement; build into OPEX as a periodic stream.</li><li>Current distribution uniformity is hard above ~1 m² electrode — split into multiple cells in series rather than one giant cell.</li><li>Electrolyte purification / makeup gets expensive at commercial scale; consider in-loop ion-exchange.</li></ul></details><details class='risks'><summary>Downstream (4)</summary><ul><li>Distillation: reflux ratio + tray count must be set from VLE data, not lab approximation; capex follows ~0.65 scaling.</li><li>Extraction: solvent recovery loop is essential — virgin solvent OPEX kills the economics if recovery &lt; 95%.</li><li>Crystallisation: scale-up to &gt;1 ton requires a defined cooling profile (PAT/seeding) to avoid agglomeration.</li><li>Membrane separation: flux declines with feed concentration; fouling cleaning cycle = OPEX line.</li></ul></details><details class='risks'><summary>EHS / safety (2)</summary><ul><li>CO is toxic (TLV 25 ppm) and flammable; CO monitors + double-block-and-bleed; never use as an indoor-vented anode feed.</li><li>CO2 above 5 vol-% causes asphyxiation; ventilated rooms + CO2 monitors; CO2 storage tanks rated for thermal expansion.</li></ul></details></div>
+
+  <div class="card">
+    <h2>🧪 Inputs / outputs (per batch)</h2>
+    <table>
+      <tr><th>Stream</th><th>Role</th><th class="num">g/batch</th>
+          <th class="num">Recovery</th></tr>
+      <tr><td>CO2</td><td>input</td><td class='num'>1.57</td><td class='num'>0.00</td></tr><tr><td>Furfural</td><td>input</td><td class='num'>0.86</td><td class='num'>0.90</td></tr><tr><td>KHCO3</td><td>input</td><td class='num'>0.1</td><td class='num'>0.90</td></tr><tr><td>H2O</td><td>input</td><td class='num'>2.5</td><td class='num'>0.00</td></tr><tr><td>CO</td><td>output</td><td class='num'>1.00009</td><td class='num'>—</td></tr><tr><td>FuroicAcid</td><td>output</td><td class='num'>1.82591</td><td class='num'>—</td></tr>
+    </table>
+  </div>
+
+  <div class='card'><h2>📚 Chemical price references</h2><table><tr><th>Component</th><th class='num'>Active $/kg</th><th>Active source</th><th>Other sources on file</th></tr><tr><td>CO</td><td class='num'>$5.68</td><td>Echemi 2025</td><td class='small' style='color:var(--muted)'>Echemi 2024 $4.73; Echemi 2023 $2.57; Na 2019 paper assumption 2019 $0.60</td></tr><tr><td>CO2</td><td class='num'>$0.03</td><td>Shin 2021 2021</td><td class='small' style='color:var(--muted)'>Bagemihl 2023 DAC 2023 $0.04; Na 2019 captured CO2 2019 $0.06; Industrial bulk CO2 2024 $0.10</td></tr><tr><td>Furfural</td><td class='num'>$1.50</td><td>Furfural, bulk bio-derived</td><td class='small' style='color:var(--muted)'></td></tr><tr><td>FuroicAcid</td><td class='num'>$5.00</td><td>2-furoic acid, specialty</td><td class='small' style='color:var(--muted)'></td></tr><tr><td>H2O</td><td class='num'>$0.00</td><td>Nat Commun 2021</td><td class='small' style='color:var(--muted)'></td></tr><tr><td>KHCO3</td><td class='num'>$0.55</td><td>industrial</td><td class='small' style='color:var(--muted)'></td></tr></table></div>
+
+  <div class="card">
+    <h2>🛠️ Equipment</h2>
+    <table>
+      <tr><th>Section</th><th>Equipment</th><th class="num">Base cost ($)</th>
+          <th>Source</th><th>Lifetime</th></tr>
+      <tr><td>Feedstock Pretreatment</td><td>Pretreatment Mill / Mixer</td><td class='num'>$120,000</td><td>default</td><td>permanent</td></tr><tr><td>Reaction
+25 °C · 1 h · 2.4 V · 200 mA/cm² · FE 85%</td><td>Electrolyzer cell housing</td><td class='num'>$10,000</td><td>260506 COOR-ORR TEA workbook</td><td>30 y</td></tr><tr><td>Reaction
+25 °C · 1 h · 2.4 V · 200 mA/cm² · FE 85%</td><td>Electrode pair</td><td class='num'>$964</td><td>260506 COOR-ORR TEA workbook</td><td>5 y</td></tr><tr><td>Reaction
+25 °C · 1 h · 2.4 V · 200 mA/cm² · FE 85%</td><td>Nafion 117 membrane</td><td class='num'>$180</td><td>Chemours catalog</td><td>5 y</td></tr><tr><td>Reaction
+25 °C · 1 h · 2.4 V · 200 mA/cm² · FE 85%</td><td>Balance of plant (BoP)</td><td class='num'>$3,500</td><td>industry standard 35% factor</td><td>30 y</td></tr><tr><td>Cathode gas-liquid separation</td><td>Cathode gas-liquid separation unit (Flash + PSA (zeolite LiX))</td><td class='num'>$450,000</td><td>default</td><td>permanent</td></tr><tr><td>Anode product extraction</td><td>Anode product extraction unit (MTBE liquid-liquid extraction)</td><td class='num'>$250,000</td><td>default</td><td>permanent</td></tr><tr><td>Furoic acid distillation</td><td>Furoic acid distillation unit (Distillation)</td><td class='num'>$500,000</td><td>default</td><td>permanent</td></tr>
+    </table>
+  </div>
+
+</div>
+
+<footer>
+  Generated by tea_tool · auto-builder · 2026-05-27 16:53<br>
+  Mermaid via CDN — internet required for first load, then cached.
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+  function pickMermaidTheme() {
+    const t = document.documentElement.getAttribute("data-theme");
+    if (t === "dark") return "dark";
+    if (t === "light") return "default";
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "default";
+  }
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: pickMermaidTheme(),
+    securityLevel: "loose",
+    flowchart: {
+      htmlLabels: true, curve: "basis",
+      nodeSpacing: 60, rankSpacing: 90,
+      padding: 10,
+    },
+    themeVariables: { fontSize: "15px" }
+  });
+
+  // After mermaid renders the SVG, attach pan-zoom controls.
+  window.__panZoomInstance = null;
+  window.addEventListener("load", () => {
+    setTimeout(() => {
+      const svg = document.querySelector("#pfd-host svg");
+      if (!svg) return;
+      svg.style.maxWidth = "none";
+      svg.style.width = "100%";
+      svg.style.height = "100%";
+      window.__panZoomInstance = svgPanZoom(svg, {
+        zoomEnabled: true,
+        panEnabled: true,
+        controlIconsEnabled: false,
+        fit: true, center: true,
+        minZoom: 0.3, maxZoom: 8,
+        zoomScaleSensitivity: 0.3,
+      });
+    }, 400);
+  });
+
+  window.pfdZoom = (factor) => {
+    if (window.__panZoomInstance) window.__panZoomInstance.zoomBy(factor);
+  };
+  window.pfdReset = () => {
+    if (window.__panZoomInstance) {
+      window.__panZoomInstance.resetZoom();
+      window.__panZoomInstance.center();
+      window.__panZoomInstance.fit();
+    }
+  };
+  window.pfdFullscreen = () => {
+    const card = document.getElementById("pfd-card");
+    card.classList.toggle("pfd-fullscreen");
+    setTimeout(() => { if (window.__panZoomInstance) {
+      window.__panZoomInstance.resize();
+      window.__panZoomInstance.fit();
+      window.__panZoomInstance.center();
+    } }, 100);
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script>
+  function toggleTheme() {
+    const cur = document.documentElement.getAttribute("data-theme");
+    const next = (cur === "dark") ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    localStorage.setItem("tea-theme", next);
+    location.reload();
+  }
+  // restore
+  const saved = localStorage.getItem("tea-theme");
+  if (saved) document.documentElement.setAttribute("data-theme", saved);
+
+  const SENSITIVITY_DATA = {"CO2 ($/kg)": [[0.05, -2.946692211568886], [0.2, -2.817715427390038], [0.4, -2.645746381818241], [0.8, -2.301808290674647], [2.0, -1.2699940172438648]]};
+  window.addEventListener("DOMContentLoaded", () => {
+    const txt = getComputedStyle(document.documentElement).getPropertyValue("--fg").trim();
+    const acc = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim();
+    for (const [title, points] of Object.entries(SENSITIVITY_DATA)) {
+      const id = "chart_" + title.replace(/[^a-zA-Z0-9]/g, "_");
+      const el = document.getElementById(id);
+      if (!el) continue;
+      new Chart(el, {
+        type: "line",
+        data: {
+          labels: points.map(p => p[0]),
+          datasets: [{
+            label: "MSP ($/kg)",
+            data: points.map(p => p[1]),
+            borderColor: acc, backgroundColor: acc + "33",
+            tension: 0.3, pointRadius: 5,
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          scales: { x: { ticks: { color: txt } },
+                    y: { ticks: { color: txt }, title: { display: true, text: "MSP ($/kg)", color: txt } } },
+          plugins: { legend: { display: false } }
+        }
+      });
+    }
+  });
+</script>
+</body>
+</html>

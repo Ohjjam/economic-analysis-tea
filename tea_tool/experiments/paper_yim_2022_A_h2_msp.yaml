@@ -1,0 +1,110 @@
+# Option A: MSP product = H2.  vanillin + acetovanillone are byproduct credits.
+# This reflects the paper's actual claim — "low-voltage H2" is the headline,
+# and aromatics are valuable byproducts that fund the system.
+meta:
+  name: "Yim/Oh 2022 — Option A (H2 as MSP product)"
+  slug: "paper_yim_2022_A_h2_msp"
+  date: 2026-05-27
+  researcher: "auto-variant of paper_yim_2022_modular_flow_lignin"
+  lab: "POSTECH + UNIST"
+  notes: "Variant of the Yim 2022 paper YAML: H2 is the MSP product;
+          vanillin and acetovanillone are sold as byproducts."
+
+chemistry:
+  reaction_type: "electrochemical"
+  description: "Same paired-flow PMA process; only MSP target changes."
+  target_products:
+    - "H2"
+    - "Vanillin"
+    - "Acetovanillone"
+
+feedstock:
+  primary:
+    name: "Organosolv Lignin"
+    mass_per_batch_g: 1.10
+    purity_pct: 95
+    price_usd_per_kg: 0.40
+    source_note: "Kraft lignin"
+  reagents:
+    - name: "PMA"
+      mass_per_batch_g: 11.0
+      recovery_fraction: 0.99
+      role: "catalyst"
+      price_usd_per_kg: 0.01
+    - name: "H2SO4"
+      mass_per_batch_g: 1.18
+      recovery_fraction: 0.97
+      role: "solvent"
+      price_usd_per_kg: 0.037
+    - name: "H2O"
+      mass_per_batch_g: 12.0
+      recovery_fraction: 0.95
+      role: "utility"
+      price_usd_per_kg: 0.00022
+    - name: "Chloroform"
+      mass_per_batch_g: 6.0
+      recovery_fraction: 0.95
+      role: "solvent"
+      price_usd_per_kg: 1.50
+
+operating_conditions:
+  temperature_C: 80
+  pressure_bar: 35
+  ph: 0.5
+  reaction_time_h: 0.53
+  electrochem:
+    cell_voltage_V: 1.5
+    current_density_mA_cm2: 20.5
+    faradaic_efficiency_pct: 100
+    electrode_area_cm2: 1.0
+    electrolyte: "1 M H2SO4 + PMA"
+    membrane: "Nafion"
+
+results:
+  yields:
+    - product: "H2"
+      yield_pct: 0.20      # raised — paper headline product
+      selectivity_pct: 100
+    - product: "Vanillin"
+      yield_pct: 0.05
+      selectivity_pct: 65
+    - product: "Acetovanillone"
+      yield_pct: 0.017
+      selectivity_pct: 22
+
+downstream:
+  - step: "Chloroform extraction"
+    method: "In-line liquid-liquid extraction"
+    solvent: "Chloroform"
+    solvent_loading_kg_per_kg_feed: 5.0
+    recovery_pct: 95
+  - step: "Density-based phase separation"
+    method: "Phase separation"
+    recovery_pct: 95
+  - step: "Chloroform recovery"
+    method: "Distillation"
+    recovery_pct: 95
+  - step: "Vanillin crystallisation"
+    method: "Cooling crystallization"
+    recovery_pct: 80
+    target_purity_pct: 98
+  - step: "Electrolyzer (PMA reactivation + HER)"
+    method: "Flow electrolyzer (Nafion-based PEM)"
+    recovery_pct: 100
+
+constraints:
+  preferred_msp_product: "H2"
+  hazardous_materials: ["chloroform", "h2so4", "h2"]
+  scale_up_priority: "balanced"
+  plant_lifetime_years: 20
+  discount_rate: 0.10
+
+scale_targets:
+  scales_ton_per_batch: [0.001, 0.01, 0.1, 1.0, 10.0]
+  capacity_factor: 0.90
+  batch_hours: 0.53
+
+reported:
+  msp_usd_per_kg: null
+  source: "Variant — H2 MSP basis"
+  benchmark: "Conventional water electrolysis ~$3-5/kg H2 (50 kWh/kg)"

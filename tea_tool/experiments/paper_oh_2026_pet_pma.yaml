@@ -1,0 +1,343 @@
+# Paper: Oh, Lee, Lee et al., Green Chemistry 2026, 28, 3573.
+# "Mild hydrolysis of PET and electrochemical energy recovery via
+#  multifunctional polyoxometalate catalysts" (UNIST; doi:10.1039/d5gc04677g)
+# This is the source paper for the project's PET TEA template.
+#
+# SCHEMA v2 EXEMPLAR — every price/assumption carries a `*_ref` citation id,
+# and the `pfd:` block fully specifies the process flow diagram (units with
+# operating conditions, streams classed feed/intermediate/recycle/product,
+# and the initial-vs-makeup charge distinction). Validate with:
+#     python -m tea_engine.validate_cli experiments/paper_oh_2026_pet_pma.yaml
+schema_version: 2
+
+meta:
+  name: "Oh 2026 — Mild PET hydrolysis (PMA + EC)"
+  slug: "paper_oh_2026_pet_pma"
+  date: 2026-01-05
+  researcher: "Oh, Lee, Lee et al. (Green Chem.)"
+  lab: "UNIST Energy & Chemical Engineering"
+  notes: |
+    User's own paper. Multifunctional PMA catalyst hydrolyzes PET at
+    100 °C / 1 M H2SO4 in H2O — TPA precipitates, EG dissolves and
+    is subsequently oxidized to glycolic acid (GA) and formic acid (FA),
+    storing 8.34 mmol of electrons in PMA(red). The stored electrons
+    are then used either to drive low-energy H2 production
+    (125 mA cm-2 at 1.2 V) or generate electricity (12.5 mW cm-2 at 0.05 V).
+    Reported baseline MSP = $0.81/kg TPA (95 % DMSO recovery → $0.87/kg).
+
+# ============================================================================
+# References — first-class citation registry (schema v2).
+# Every sourced number elsewhere in this file points here via a *_ref id.
+# ============================================================================
+references:
+  - id: oh2026
+    citation: "Oh, Lee, Lee et al., Green Chem. 2026, 28, 3573 (this paper)"
+    type: literature
+    doi: "10.1039/d5gc04677g"
+  - id: recycling_market_2024
+    citation: "Post-consumer / waste PET recycling market price, 2024"
+    type: market
+    note: "Waste PET feedstock low-end basis."
+  - id: icis2024
+    citation: "ICIS Chemical Business — PET contract price, 2024"
+    type: market
+  - id: made_in_china
+    citation: "Made-in-China.com industrial bulk quotes (PMA, H2SO4), 2024"
+    type: vendor
+  - id: echemi
+    citation: "Echemi market price — DMSO, 2024"
+    type: market
+  - id: natcomm2021
+    citation: "Na, Seh et al., Nat. Commun. 12, 4679 (2021)"
+    type: literature
+    doi: "10.1038/s41467-021-25214-1"
+    note: "Electrolyzer $/m^2, capacity factor, H2O price, M+O fractions."
+  - id: kepco2024
+    citation: "KEPCO industrial electricity tariff, 2024"
+    type: market
+  - id: turton2018
+    citation: "Turton et al., Analysis, Synthesis & Design of Chemical Processes, 5th ed. (2018)"
+    type: literature
+    note: "Medium-pressure steam $4.77/GJ."
+  - id: iecr2021
+    citation: "Ind. Eng. Chem. Res. 2021, 60, 5588–5599"
+    type: literature
+    note: "Formic-acid distillation CAPEX/OPEX correlation."
+  - id: joule2021
+    citation: "Joule 5, 2479–2503 (2021)"
+    type: literature
+    note: "Discount rate 10%, 30-year plant life."
+
+chemistry:
+  reaction_type: "hybrid"
+  description: |
+    Two-stage hybrid: (1) acid hydrolysis of PET in PMA / H2SO4 / DMSO
+    co-solvent system → TPA(s) + EG(aq); (2) PMA-mediated oxidation of
+    EG → glycolic acid → formic acid with electron storage in
+    PMA(red); (3) electrochemical recovery: PMA(red) re-oxidation at
+    the anode coupled to HER at the cathode (or fuel-cell mode).
+  reactions:
+    - lhs: "PET + 2 H2O"
+      rhs: "TPA + EG"
+      role: "hydrolysis"
+    - lhs: "EG + PMA(ox)"
+      rhs: "GA + FA + PMA(red)"
+      role: "EG oxidation"
+    - lhs: "PMA(red) -> PMA(ox)"
+      rhs: "anode"
+      role: "regeneration"
+    - lhs: "2 H+ + 2 e-"
+      rhs: "H2"
+      role: "cathode"
+  target_products:
+    - "TPA"
+    - "FA"
+    - "H2"
+    - "Glycolic acid"
+
+feedstock:
+  primary:
+    name: "PET"
+    mass_per_batch_g: 1.0
+    purity_pct: 95
+    price_usd_per_kg: 0.10
+    price_ref: recycling_market_2024
+    source_note: "Waste/post-consumer PET, recycling market 2024"
+  reagents:
+    - name: "PMA"
+      mass_per_batch_g: 0.166
+      recovery_fraction: 0.99
+      role: "catalyst"
+      price_usd_per_kg: 0.01
+      price_ref: made_in_china
+    - name: "H2SO4"
+      mass_per_batch_g: 0.245
+      recovery_fraction: 0.99
+      role: "solvent"
+      price_usd_per_kg: 0.037
+      price_ref: made_in_china
+    - name: "DMSO"
+      mass_per_batch_g: 5.0
+      recovery_fraction: 0.99            # via 180 °C distillation
+      role: "solvent"
+      price_usd_per_kg: 1.50
+      price_ref: echemi
+    - name: "H2O"
+      mass_per_batch_g: 2.5
+      recovery_fraction: 0.9
+      role: "utility"
+      price_usd_per_kg: 0.00022
+      price_ref: natcomm2021
+
+operating_conditions:
+  temperature_C: 100
+  pressure_bar: 1
+  ph: 0.5
+  reaction_time_h: 2.0
+  batch_volume_ml: 10
+  electrochem:
+    cell_voltage_V: 1.2
+    current_density_mA_cm2: 125
+    faradaic_efficiency_pct: 95
+    electrode_area_cm2: 1.0
+    electrolyte: "1 M H2SO4 + DMSO + PMA(red)"
+    membrane: "Nafion"
+
+results:
+  yields:
+    - product: "TPA"
+      yield_pct: 94.0       # ~0.94 g TPA / g PET (mass)
+      selectivity_pct: 98
+    - product: "FA"
+      yield_pct: 8.0
+      selectivity_pct: 85
+    - product: "Glycolic acid"
+      yield_pct: 12.0
+      selectivity_pct: 80
+    - product: "H2"
+      yield_pct: 0.8
+  conversion_pct: 90
+  mass_balance_closure_pct: 98
+  notes: "90% PET conversion in 2 h; 1.30 mmol TPA, 1.26 mmol EG per batch (gravimetric)."
+
+downstream:
+  - step: "TPA filtration"
+    method: "Solid-liquid filtration (acid precipitation)"
+    recovery_pct: 98
+    target_purity_pct: 99
+  - step: "DMSO distillation"
+    method: "Distillation (180 °C reboiler)"
+    solvent_loading_kg_per_kg_feed: 5.0
+    recovery_pct: 99
+    target_purity_pct: 99
+  - step: "FA polishing"
+    method: "Distillation"
+    recovery_pct: 90
+    target_purity_pct: 95
+  - step: "PMA regeneration (EC)"
+    method: "Electrochemical reoxidation + H2 production"
+    recovery_pct: 99
+
+# ============================================================================
+# Standalone modeling assumptions (schema v2) — each sourced.
+# ============================================================================
+assumptions:
+  - key: "electrolyzer_cost_usd_per_m2"
+    value: 10000
+    unit: "$/m^2"
+    ref: natcomm2021
+  - key: "electricity_price_usd_per_kWh"
+    value: 0.0953
+    unit: "$/kWh"
+    ref: kepco2024
+  - key: "steam_price_usd_per_GJ"
+    value: 4.77
+    unit: "$/GJ"
+    ref: turton2018
+  - key: "fa_distillation_capex_usd_per_kg"
+    value: 0.0884
+    unit: "$/kg FA"
+    ref: iecr2021
+  - key: "fa_distillation_opex_usd_per_kg"
+    value: 0.8633
+    unit: "$/kg FA"
+    ref: iecr2021
+  - key: "maintenance_fraction_of_capex"
+    value: 0.10
+    ref: natcomm2021
+  - key: "operation_fraction_of_capex"
+    value: 0.10
+    ref: natcomm2021
+  - key: "dmso_recovery_pct"
+    value: 99.0
+    unit: "%"
+    ref: oh2026
+  - key: "current_density_mA_cm2"
+    value: 125
+    unit: "mA/cm^2"
+    ref: oh2026
+
+# ============================================================================
+# Process flow diagram (schema v2) — units carry operating conditions, streams
+# are classed, and initial vs makeup charges are made explicit.
+# ============================================================================
+pfd:
+  units:
+    - key: feed
+      label: "Feedstock Pretreatment"
+      kind: "Pretreatment"
+      conditions: {T_C: 25, P_bar: 1, note: "shred / mill PET flake"}
+    - key: rxn
+      label: "Hydrothermal Reactor"
+      kind: "Thermal Reactor"
+      conditions: {T_C: 100, P_bar: 1, residence_h: 2.0,
+                   note: "hydrothermal hydrolysis: PET+H2O->TPA(s)+EG; EG oxidised by PMA(ox)->GA/FA, e- stored in PMA(red)"}
+    - key: filt
+      label: "TPA Filtration"
+      kind: "Filter / Centrifuge"
+      conditions: {T_C: 25, P_bar: 1, note: "solid/liquid split: TPA precipitates out; EG/FA/GA + PMA(red) stay in liquor"}
+    - key: ec
+      label: "Electrochemical PMA Regeneration + H2"
+      kind: "Electrochemical Cell"
+      conditions: {V_cell: 1.2, j_mA_cm2: 125, FE_pct: 95, T_C: 25,
+                   note: "anode: PMA(red)->PMA(ox) regenerated; cathode: HER -> H2. Residual EG/FA/GA can be further oxidised here."}
+    - key: dmso_dist
+      label: "DMSO Distillation"
+      kind: "Distillation Column"
+      conditions: {T_C: 180, P_bar: 1, note: "reboiler; recovers ~99% DMSO solvent for recycle"}
+    - key: org_recovery
+      label: "Organics Recovery (distillation)"
+      kind: "Distillation Column"
+      conditions: {T_C: 100, P_bar: 1, note: "OPTIONAL (scenario B): multi-stage distillation to recover FA + glycolic acid as products"}
+  streams:
+    - {from: "in:PET",   to: feed,        label: "waste PET",            kind: feed}
+    - {from: feed,       to: rxn,         label: "shredded PET",         kind: intermediate}
+    - {from: "in:H2O",   to: rxn,         label: "hydrothermal water",   kind: feed}
+    - {from: "in:PMA",   to: rxn,         label: "PMA catalyst",         kind: feed}
+    - {from: "in:H2SO4", to: rxn,         label: "H2SO4",                kind: feed}
+    - {from: "in:DMSO",  to: rxn,         label: "DMSO co-solvent",      kind: feed}
+    - {from: rxn,        to: filt,        label: "TPA slurry + liquor",  kind: intermediate}
+    - {from: filt,       to: "out:TPA",   label: "battery-grade TPA",    kind: product}
+    - {from: filt,       to: ec,          label: "liquor: EG/FA/GA + PMA(red)", kind: intermediate}
+    - {from: ec,         to: "out:H2",    label: "H2 (cathode)",         kind: product}
+    - {from: ec,         to: rxn,         label: "regenerated PMA(ox)",  kind: recycle}
+    - {from: ec,         to: dmso_dist,   label: "spent liquor",         kind: intermediate}
+    - {from: dmso_dist,  to: rxn,         label: "recovered DMSO",       kind: recycle}
+    - {from: dmso_dist,  to: org_recovery,label: "FA/GA-rich bottoms",   kind: intermediate}
+    - {from: org_recovery, to: "out:FA",  label: "formic acid",          kind: product}
+    - {from: org_recovery, to: "out:GA",  label: "glycolic acid",        kind: product}
+  charges:
+    # initial vs makeup distinction (engineering correctness)
+    - {stream: "PMA",   kind: initial,    note: "one-time catalyst inventory; regenerated electrochemically, makeup only for losses"}
+    - {stream: "DMSO",  kind: makeup,     note: "~99% recovered by distillation; only the loss is purchased"}
+    - {stream: "H2SO4", kind: makeup,     note: "recycled; makeup for losses"}
+    - {stream: "PET",   kind: continuous, note: "continuous feed, purchased per batch"}
+    - {stream: "H2O",   kind: makeup,     note: "hydrothermal medium; largely recycled, makeup for losses"}
+
+constraints:
+  preferred_msp_product: "TPA"
+  hazardous_materials: ["h2so4", "h2"]
+  scale_up_priority: "balanced"
+  plant_lifetime_years: 30
+  discount_rate: 0.10
+  must_have_unit_operations: ["distillation", "electrolysis", "filtration"]
+
+scale_targets:
+  scales_ton_per_batch: [0.01, 0.1, 1.0, 5.0, 10.0]
+  capacity_factor: 0.85
+  batch_hours: 2.0
+
+# Numbers reported in the paper for cross-validation (auto-builder vs paper).
+reported:
+  msp_usd_per_kg: 0.81           # baseline TPA MSP
+  msp_at_95pct_dmso_recovery: 0.87
+  total_revenue_M_usd_per_y: 53.6
+  source: "Oh et al., Green Chem. 2026, 28, 3573"
+
+# ============================================================================
+# Product-strategy scenarios (schema v2, optional) — drives the generic
+# scenario engine (tea_engine/scenarios.py). Should we recover & sell each
+# co-product (EG/GA/FA), or is its separation cost > its sale value?
+# Amounts marked [stoich/est] are first-cut; replace with the measured stream
+# table. base_opex_excludes removes the FA-distillation OPEX that build_pet
+# bakes into the base so the FA increment isn't double-counted.
+# ============================================================================
+scenarios:
+  basis_scale_ton: 10.0
+  primary_product: "TPA"
+  base_coproducts: ["H2"]
+  base_opex_excludes_usd_per_ton: 1225309.96   # FA-distillation OPEX in build_pet
+  variable_coproducts:
+    - key: "EG"
+      name: "Ethylene glycol"
+      kg_per_kg_feed: 0.20
+      amount_basis: "[stoich/est] ~0.20 g/g PET (PET->TPA+EG, partial EG before oxidation)"
+      price_usd_kg: 0.60
+      price_ref: echemi
+      sep_capex_usd_per_kg: 0.0884
+      sep_opex_usd_per_kg: 0.8633
+      sep_difficulty: 1.3
+      sep_ref: iecr2021
+      feasibility: "Feasible but energy-heavy: EG bp 197 C, fully water-miscible -> high reboiler duty."
+    - key: "GA"
+      name: "Glycolic acid"
+      kg_per_kg_feed: 0.12
+      amount_basis: "[paper yield] 12% w/w on PET"
+      price_usd_kg: 1.50
+      price_ref: echemi
+      sep_capex_usd_per_kg: 0.0884
+      sep_opex_usd_per_kg: 0.8633
+      sep_difficulty: 1.6
+      sep_ref: iecr2021
+      feasibility: "Hard: GA decomposes near bp -> recovered by evaporation/crystallisation; costed as a distillation proxy x1.6."
+    - key: "FA"
+      name: "Formic acid"
+      kg_per_kg_feed: 0.08
+      amount_basis: "[paper yield] 8% w/w on PET (validated build_pet output)"
+      price_usd_kg: 0.84
+      price_ref: oh2026
+      sep_capex_usd_per_kg: 0.0884
+      sep_opex_usd_per_kg: 0.8633
+      sep_difficulty: 1.0
+      sep_ref: iecr2021
+      feasibility: "Feasible: FA bp 100.8 C but forms a water azeotrope (~78 wt%); IECR-2021 route handles it."

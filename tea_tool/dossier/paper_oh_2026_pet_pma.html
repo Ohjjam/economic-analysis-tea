@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>PFD — PET Depolymerization (PMA + Electrolysis)</title>
+<style>
+  :root, html[data-theme="light"] {
+    --bg: #fafafa; --fg: #111; --muted: #555; --accent: #1565C0;
+    --card: #fff; --border: #e0e0e0;
+  }
+  html[data-theme="dark"] {
+    --bg: #1a1a1a; --fg: #eee; --muted: #aaa; --accent: #64B5F6;
+    --card: #232323; --border: #333;
+  }
+  @media (prefers-color-scheme: dark) {
+    html[data-theme="auto"] {
+      --bg: #1a1a1a; --fg: #eee; --muted: #aaa; --accent: #64B5F6;
+      --card: #232323; --border: #333;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--fg); margin: 0;
+          font: 14px/1.5 -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  header { padding: 20px 28px; border-bottom: 1px solid var(--border);
+            background: var(--card); }
+  h1 { margin: 0; font-size: 20px; font-weight: 600; }
+  h1 .small { color: var(--muted); font-weight: 400; font-size: 14px; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 24px 28px; }
+  .card { background: var(--card); border: 1px solid var(--border);
+           border-radius: 8px; padding: 18px 22px; margin-bottom: 18px; }
+  h2 { margin-top: 0; font-size: 16px; color: var(--accent);
+        border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+  .kv { display: grid; grid-template-columns: 200px 1fr; gap: 6px 18px; }
+  .kv dt { color: var(--muted); }
+  .kv dd { margin: 0; font-weight: 500; }
+  table { width: 100%; border-collapse: collapse; margin: 6px 0; }
+  th, td { text-align: left; padding: 6px 10px;
+            border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 500; font-size: 12px;
+        text-transform: uppercase; letter-spacing: 0.04em; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .pfd-wrap { background: var(--card); border-radius: 8px;
+               border: 1px solid var(--border); padding: 14px;
+               position: relative; }
+  .pfd-toolbar { position: absolute; top: 12px; right: 14px; z-index: 5;
+                   display: flex; gap: 6px; }
+  .pfd-toolbar button { background: var(--card); color: var(--fg);
+                          border: 1px solid var(--border); border-radius: 4px;
+                          padding: 4px 10px; font-size: 13px; cursor: pointer; }
+  .pfd-toolbar button:hover { background: var(--accent); color: white; }
+  /* PFD scroll-host. SVG renders at its natural width (mermaid's default);
+     if it's wider than the viewport the host scrolls horizontally.
+     Height grows to fit the SVG so nothing is ever clipped vertically. */
+  .pfd { width: 100%; overflow: auto; padding: 8px 0; }
+  .pfd svg { display: block; margin: 0 auto;
+               max-width: none;
+               height: auto;
+               transform-origin: top left;
+               transform: scale(var(--pfd-scale, 1)); }
+  .pfd .node text, .pfd .nodeLabel, .pfd .edgeLabel { font-size: 14px !important; }
+  .pfd-fullscreen { position: fixed; inset: 0; z-index: 1000;
+                      background: var(--bg); padding: 60px 24px 24px;
+                      overflow: auto; }
+  details.risks { margin-top: 8px; }
+  details.risks summary { cursor: pointer; color: var(--accent);
+                           font-weight: 500; padding: 4px 0; }
+  details.risks ul { margin: 6px 0; padding-left: 24px; }
+  footer { color: var(--muted); font-size: 12px;
+            padding: 18px 28px; text-align: center; }
+  .badge { display: inline-block; padding: 2px 8px;
+            background: var(--accent); color: white; border-radius: 4px;
+            font-size: 11px; margin-left: 6px; }
+  .theme-toggle { position: fixed; top: 14px; right: 16px;
+                   background: var(--card); color: var(--fg);
+                   border: 1px solid var(--border); border-radius: 6px;
+                   padding: 6px 12px; font-size: 13px; cursor: pointer;
+                   z-index: 100; }
+  .theme-toggle:hover { background: var(--accent); color: white; }
+  .chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+                 gap: 16px; }
+  .chart-box { background: var(--card); border: 1px solid var(--border);
+                border-radius: 6px; padding: 10px 14px; }
+  .chart-box h3 { margin: 0 0 8px 0; font-size: 13px; color: var(--muted);
+                   font-weight: 500; }
+  canvas { max-height: 220px; }
+</style>
+</head>
+<body>
+<button class="theme-toggle" onclick="toggleTheme()">🌓 theme</button>
+<header>
+  <h1>PET Depolymerization (PMA + Electrolysis) <span class="small">— Oh, Lee, Lee et al. (Green Chem.)</span></h1>
+</header>
+<div class="container">
+
+  <div class="card pfd-wrap" id="pfd-card">
+    <h2>📐 Process Flow Diagram</h2>
+    <div class="pfd-toolbar">
+      <button onclick="pfdZoom(1.25)">🔍+</button>
+      <button onclick="pfdZoom(0.8)">🔍−</button>
+      <button onclick="pfdReset()">↺ reset</button>
+      <button onclick="pfdFullscreen()">⛶ full</button>
+    </div>
+    <div class="pfd" id="pfd-host">
+      <pre class="mermaid">
+flowchart LR
+    in_PET(["PET"])
+    in_H2O(["H2O"])
+    in_PMA(["PMA"])
+    in_H2SO4(["H2SO4"])
+    in_DMSO(["DMSO"])
+    u_feed["Feedstock Pretreatment<br/>25 °C · 1 bar · shred / mill PET flake"]
+    u_rxn["Hydrothermal Reactor<br/>100 °C · 1 bar · τ 2 h · hydrothermal hydrolysis: PET+H2O->TPA❨s❩+EG, EG oxidised by PMA❨ox❩->GA/FA, e- stored in PMA❨red❩"]
+    u_filt["TPA Filtration<br/>25 °C · 1 bar · solid/liquid split: TPA precipitates out, EG/FA/GA + PMA❨red❩ stay in liquor"]
+    u_ec["Electrochemical PMA Regeneration + H2<br/>25 °C · 1.2 V · 125 mA/cm² · FE 95% · anode: PMA❨red❩->PMA❨ox❩ regenerated, cathode: HER -> H2. Residual EG/FA/GA can be further oxidised here."]
+    u_dmso_dist["DMSO Distillation<br/>180 °C · 1 bar · reboiler, recovers ~99% DMSO solvent for recycle"]
+    u_org_recovery["Organics Recovery ❨distillation❩<br/>100 °C · 1 bar · OPTIONAL ❨scenario B❩: multi-stage distillation to recover FA + glycolic acid as products"]
+    out_TPA(["TPA"])
+    out_H2(["H2"])
+    out_FA(["FA"])
+    out_GA(["GA"])
+    in_PET -->|waste PET| u_feed
+    u_feed -->|shredded PET| u_rxn
+    in_H2O -->|hydrothermal water| u_rxn
+    in_PMA -->|PMA catalyst| u_rxn
+    in_H2SO4 -->|H2SO4| u_rxn
+    in_DMSO -->|DMSO co-solvent| u_rxn
+    u_rxn -->|TPA slurry + liquor| u_filt
+    u_filt -->|battery-grade TPA| out_TPA
+    u_filt -->|liquor: EG/FA/GA + PMA❨red❩| u_ec
+    u_ec -->|H2 ❨cathode❩| out_H2
+    u_ec -.->|♻ regenerated PMA❨ox❩| u_rxn
+    u_ec -->|spent liquor| u_dmso_dist
+    u_dmso_dist -.->|♻ recovered DMSO| u_rxn
+    u_dmso_dist -->|FA/GA-rich bottoms| u_org_recovery
+    u_org_recovery -->|formic acid| out_FA
+    u_org_recovery -->|glycolic acid| out_GA
+    classDef feed fill:#FFE0B2,stroke:#E65100;
+    classDef prod fill:#C8E6C9,stroke:#2E7D32;
+    classDef unit fill:#E1BEE7,stroke:#6A1B9A;
+    class in_PET,in_H2O,in_PMA,in_H2SO4,in_DMSO feed;
+    class out_TPA,out_H2,out_FA,out_GA prod;
+    class u_feed,u_rxn,u_filt,u_ec,u_dmso_dist,u_org_recovery unit;
+      </pre>
+    </div>
+  </div>
+
+  <div class='card'><h2>⚙️ Operating conditions</h2><table><tr><th>Stage</th><th>Type</th><th>Conditions</th></tr><tr><td><b>Reaction</b></td><td>hybrid</td><td>T = <b>100 °C</b> · P = 1 bar · τ = 2 h · V = <b>1.2 V</b> · j = <b>125 mA/cm²</b> · FE = 95%</td></tr></table></div>
+
+  <div class='card'><h2>⚡ Energy OPEX (annualised @ 10 t/batch)</h2><table><tr><th>Line item</th><th class='num'>$/year</th></tr><tr><td>  Utility - Electricity (H2 Electrolysis)</td><td class='num'>$5,670,625/y</td></tr><tr><td>  Utility - Heat</td><td class='num'>$2,699,762/y</td></tr></table><h3 style='margin:14px 0 6px;font-size:13px'>Basis &amp; sources</h3><table><tr><th>Parameter</th><th class='num'>Value [ref]</th></tr><tr><td>electricity_price_usd_per_kWh</td><td class='num'>0.0953 $/kWh <sup><a href='#ref-7' style='color:var(--accent);text-decoration:none'>[7]</a></sup></td></tr><tr><td>steam_price_usd_per_GJ</td><td class='num'>4.77 $/GJ <sup><a href='#ref-8' style='color:var(--accent);text-decoration:none'>[8]</a></sup></td></tr><tr><td>current_density_mA_cm2</td><td class='num'>125 mA/cm^2 <sup><a href='#ref-1' style='color:var(--accent);text-decoration:none'>[1]</a></sup></td></tr></table><p class='small' style='color:var(--muted);margin-top:8px'>Electricity (electrolysis) = specific energy × H₂ output × $/kWh; heat = reactor/evaporation duty × $/GJ. The basis values above carry [n] links to the numbered reference list.</p></div>
+
+  <div class="card">
+    <h2>📊 Topline TEA <span class="badge">at 10 t/batch</span></h2>
+    <dl class="kv">
+      <dt>CAPEX total</dt><dd>$133.11 M</dd>
+      <dt>CAPEX annualized</dt><dd>$16.21 M/y</dd>
+      <dt>OPEX</dt><dd>$30.74 M/y</dd>
+      <dt>Revenue total</dt><dd>$55.30 M/y</dd>
+      <dt>Net profit</dt><dd><b>$8.35 M/y</b></dd>
+      <dt>MSP of TPA</dt><dd>$0.66 /kg  <span class='small' style='color:var(--muted)'>(paper: $0.81/kg)</span></dd>
+    </dl>
+    <p class="small" style="color:var(--muted);margin-top:6px">
+      <b>MSP of TPA</b> = the TPA selling price at which the
+      project breaks even (NPV = 0 over the plant life), <i>after</i> crediting
+      revenue from all co-products. Net profit above uses current market prices
+      for every product.</p>
+  </div>
+
+  <div class='card'><h2>💰 Revenue breakdown @ 10 t/batch</h2><table><tr><th>Product</th><th class='num'>$M/y</th></tr><tr><td>TPA</td><td class='num'>$28.45</td></tr><tr><td>FA</td><td class='num'>$11.92</td></tr><tr><td>H2</td><td class='num'>$14.92</td></tr></table></div>
+
+  <div class='card'><h2>💵 Detailed economics by scale</h2><table><tr><th>Line item ($M/y unless noted)</th><th class='num'>1 t/batch</th><th class='num'>5 t/batch</th><th class='num'>10 t/batch</th></tr><tr><td><span>Annualized CAPEX</span></td><td class='num'>$3.76 M</td><td class='num'>$10.36 M</td><td class='num'>$16.21 M</td></tr><tr><td><span>  Feedstock OPEX</span></td><td class='num'>$0.68 M</td><td class='num'>$3.38 M</td><td class='num'>$6.77 M</td></tr><tr><td><span>  Utility OPEX (heat + electricity)</span></td><td class='num'>$0.88 M</td><td class='num'>$4.41 M</td><td class='num'>$8.83 M</td></tr><tr><td><span>  Maintenance + operation</span></td><td class='num'>$1.95 M</td><td class='num'>$8.03 M</td><td class='num'>$15.14 M</td></tr><tr><td><b>OPEX total</b></td><td class='num'>$3.51 M</td><td class='num'>$15.83 M</td><td class='num'>$30.74 M</td></tr><tr><td><span>  Revenue — TPA</span></td><td class='num'>$2.85 M</td><td class='num'>$14.23 M</td><td class='num'>$28.45 M</td></tr><tr><td><span>  Revenue — FA</span></td><td class='num'>$1.19 M</td><td class='num'>$5.96 M</td><td class='num'>$11.92 M</td></tr><tr><td><span>  Revenue — H2</span></td><td class='num'>$1.49 M</td><td class='num'>$7.46 M</td><td class='num'>$14.92 M</td></tr><tr><td><b>Revenue total</b></td><td class='num'>$5.53 M</td><td class='num'>$27.65 M</td><td class='num'>$55.30 M</td></tr><tr><td><b>Net profit</b></td><td class='num'>$-1.74 M</td><td class='num'>$1.46 M</td><td class='num'>$8.35 M</td></tr><tr><td><b>MSP of TPA</b></td><td class='num'><b>$1.51/kg</b></td><td class='num'><b>$0.84/kg</b></td><td class='num'><b>$0.66/kg</b></td></tr></table><p class='small' style='color:var(--muted);margin-top:8px'>Net profit = revenue total − (annualized CAPEX + OPEX total), at current market prices. Utility OPEX bundles heat (steam/reactor duty) and electricity (electrolysis); see the Energy OPEX card for the split.</p></div>
+
+  <div class='card'><h2>🏭 CAPEX breakdown (every unit, installed @ 10 t/batch)</h2><table><tr><th>Equipment</th><th class='num'>Installed cost</th><th>Source / basis</th></tr><tr style='background:var(--border)'><td colspan='3'><b>Feedstock Pretreatment</b></td></tr><tr><td style='padding-left:20px'>Conveyor transfer system</td><td class='num'>$13,106,126</td><td class='small'></td></tr><tr><td style='padding-left:20px'>Truck dumper package</td><td class='num'>$749,291</td><td class='small'></td></tr><tr><td style='padding-left:20px'>Dust collection system</td><td class='num'>$189,489</td><td class='small'></td></tr><tr><td style='padding-left:20px'>Feedstock storage dome</td><td class='num'>$2,369,476</td><td class='small'></td></tr><tr><td style='padding-left:20px'>Shredder</td><td class='num'>$699,690</td><td class='small'></td></tr><tr><td style='padding-left:20px'>Extruder</td><td class='num'>$8,028,569</td><td class='small'></td></tr><tr><td style='padding-left:20px'>Microgranulator</td><td class='num'>$2,246,653</td><td class='small'></td></tr><tr><td style='padding-left:20px;color:var(--muted)'><i>Feedstock Pretreatment subtotal</i></td><td class='num' style='color:var(--muted)'><i>$27,389,294</i></td><td></td></tr><tr style='background:var(--border)'><td colspan='3'><b>PET Depolymerization</b></td></tr><tr><td style='padding-left:20px'>Small particle conveyor</td><td class='num'>$1,608,194</td><td class='small'></td></tr><tr><td style='padding-left:20px'>PMA storage and transfer</td><td class='num'>$1,137,645</td><td class='small'></td></tr><tr><td style='padding-left:20px'>Water recirculation pump</td><td class='num'>$28,927</td><td class='small'></td></tr><tr><td style='padding-left:20px'>Depolymerization reactor (×7)</td><td class='num'>$22,651,972</td><td class='small'></td></tr><tr><td style='padding-left:20px'>Storage tanks</td><td class='num'>$388,651</td><td class='small'></td></tr><tr><td style='padding-left:20px'>Reactor effluent cooler</td><td class='num'>$167,435</td><td class='small'></td></tr><tr><td style='padding-left:20px'>Caustic storage and transfer</td><td class='num'>$536,050</td><td class='small'></td></tr><tr><td style='padding-left:20px;color:var(--muted)'><i>PET Depolymerization subtotal</i></td><td class='num' style='color:var(--muted)'><i>$26,518,874</i></td><td></td></tr><tr style='background:var(--border)'><td colspan='3'><b>TPA Filtration &amp; Crystallization</b></td></tr><tr><td style='padding-left:20px'>Solids filter package</td><td class='num'>$7,673,664</td><td class='small'></td></tr><tr><td style='padding-left:20px'>rTPA crystallizer</td><td class='num'>$14,056,598</td><td class='small'></td></tr><tr><td style='padding-left:20px'>rTPA centrifuge</td><td class='num'>$2,882,119</td><td class='small'></td></tr><tr><td style='padding-left:20px'>rTPA crystals dryer</td><td class='num'>$2,714,613</td><td class='small'></td></tr><tr><td style='padding-left:20px;color:var(--muted)'><i>TPA Filtration &amp; Crystallization subtotal</i></td><td class='num' style='color:var(--muted)'><i>$27,326,994</i></td><td></td></tr><tr style='background:var(--border)'><td colspan='3'><b>Electrolysis</b></td></tr><tr><td style='padding-left:20px'>Electrolyzer</td><td class='num'>$23,720,788</td><td class='small'></td></tr><tr><td style='padding-left:20px'>H2 storage tank</td><td class='num'>$1,528,734</td><td class='small'></td></tr><tr><td style='padding-left:20px;color:var(--muted)'><i>Electrolysis subtotal</i></td><td class='num' style='color:var(--muted)'><i>$25,249,521</i></td><td></td></tr><tr><td><b>ISBL (inside battery limits)</b></td><td class='num'><b>$106,484,683</b></td><td></td></tr><tr><td>OSBL (25% of ISBL)</td><td class='num'>$26,621,171</td><td class='small'>standard factor</td></tr><tr><td><b>Total installed CAPEX</b></td><td class='num'><b>$133,105,854</b></td><td class='small'>× CRF 0.1061 → $14.12 M/y annualized</td></tr></table><p class='small' style='color:var(--muted);margin-top:8px'>Installed cost scales from the reference quote by the 0.6 power law × CEPCI(2023). Equipment quotes are from the source paper TEA basis unless a source is shown. Annualized via CRF = 0.1061 (10%, 30 y).</p></div>
+
+  <div class='card'><h2>🧾 OPEX breakdown (every line @ 10 t/batch)</h2><table><tr><th>Line item</th><th class='num'>$/year</th></tr><tr><td style='padding-left:22px'>Feedstock - PET</td><td class='num'>$3,504,000</td></tr><tr><td style='padding-left:22px'>Feedstock - PMA makeup</td><td class='num'>$0</td></tr><tr><td style='padding-left:22px'>Feedstock - H2SO4 makeup</td><td class='num'>$0</td></tr><tr><td style='padding-left:22px'>Feedstock - DMSO makeup</td><td class='num'>$2,890,800</td></tr><tr><td style='padding-left:22px'>Feedstock - H2O</td><td class='num'>$370,762</td></tr><tr><td style='padding-left:6px'><i>Feedstock Total</i></td><td class='num'><i>$6,765,562</i></td></tr><tr><td style='padding-left:22px'>Utility - Electricity (H2 Electrolysis)</td><td class='num'>$5,670,625</td></tr><tr><td style='padding-left:22px'>Utility - Heat</td><td class='num'>$2,699,762</td></tr><tr><td style='padding-left:22px'>Utility - Mechanical Crushing</td><td class='num'>$455,520</td></tr><tr><td style='padding-left:6px'><i>Utility Total</i></td><td class='num'><i>$8,825,907</i></td></tr><tr><td style='padding-left:22px'>FA Distillation OPEX</td><td class='num'>$12,253,100</td></tr><tr><td style='padding-left:22px'>Maintenance (~CAPEX 0.6-power)</td><td class='num'>$1,445,255</td></tr><tr><td style='padding-left:22px'>Operation (~CAPEX 0.6-power)</td><td class='num'>$1,445,255</td></tr><tr><td style='padding-left:22px'>Maintenance (% of CAPEX)</td><td class='num'>$0</td></tr><tr><td style='padding-left:22px'>Operation (% of CAPEX)</td><td class='num'>$0</td></tr><tr><td style='padding-left:6px'><i>Operation Total</i></td><td class='num'><i>$15,143,610</i></td></tr><tr style='border-top:2px solid var(--accent)'><td><b>OPEX total</b></td><td class='num'><b>$30,735,080/y</b></td></tr></table><p class='small' style='color:var(--muted);margin-top:8px'>Feedstock = makeup × price (recovered fractions excluded). Utility = energy coefficients × throughput. Maintenance + operation per the assumptions table. Component prices &amp; their sources are listed in the price-references card below.</p></div>
+
+  <div class="card">
+    <h2>📈 Scale-up ladder</h2>
+    <table>
+      <tr><th>Stage</th><th class="num">t/batch</th>
+          <th class="num">CAPEX ($M)</th><th class="num">OPEX ($M/y)</th>
+          <th class="num">Revenue ($M/y)</th><th class="num">Net profit ($M/y)</th>
+          <th class="num">MSP TPA ($/kg)</th></tr>
+      <tr><td>Lab</td><td class='num'>0.001</td><td class='num'>0.53</td><td class='num'>0.01</td><td class='num'>0.01</td><td class='num'>-0.07</td><td class='num'>22.47</td></tr><tr><td>Bench</td><td class='num'>0.01</td><td class='num'>2.11</td><td class='num'>0.07</td><td class='num'>0.06</td><td class='num'>-0.24</td><td class='num'>9.01</td></tr><tr><td>Pilot</td><td class='num'>0.1</td><td class='num'>8.40</td><td class='num'>0.46</td><td class='num'>0.55</td><td class='num'>-0.82</td><td class='num'>3.65</td></tr><tr><td>Demo</td><td class='num'>1</td><td class='num'>33.43</td><td class='num'>3.51</td><td class='num'>5.53</td><td class='num'>-1.74</td><td class='num'>1.51</td></tr><tr><td>Commercial</td><td class='num'>10</td><td class='num'>133.11</td><td class='num'>30.74</td><td class='num'>55.30</td><td class='num'>8.35</td><td class='num'>0.66</td></tr>
+    </table>
+    <p><b>Recommendation:</b> Largest profitable stage: **Commercial** (10 ton/batch), net profit $8.35 M/y, MSP $0.66/kg. Scale up with stage gates at each ladder rung.</p>
+  </div>
+
+  <div class='card'><h2>📉 Sensitivity sweeps</h2><div class='chart-grid'><div class='chart-box'><h3>PMA recovery → MSP</h3><canvas id='chart_PMA_recovery___MSP'></canvas></div><div class='chart-box'><h3>DMSO price → MSP</h3><canvas id='chart_DMSO_price___MSP'></canvas></div></div></div>
+
+  <div class='card'><h2>⚠️ Scale-up risks</h2><details class='risks' open><summary>Generic (2)</summary><ul><li>Multi-step processes accumulate yield losses — each unit operation&#x27;s recovery becomes capex-OPEX critical.</li><li>Buffer tanks between stages required for decoupling, adding capex.</li></ul></details><details class='risks'><summary>Downstream (4)</summary><ul><li>Distillation: reflux ratio + tray count must be set from VLE data, not lab approximation; capex follows ~0.65 scaling.</li><li>Extraction: solvent recovery loop is essential — virgin solvent OPEX kills the economics if recovery &lt; 95%.</li><li>Crystallisation: scale-up to &gt;1 ton requires a defined cooling profile (PAT/seeding) to avoid agglomeration.</li><li>Membrane separation: flux declines with feed concentration; fouling cleaning cycle = OPEX line.</li></ul></details><details class='risks'><summary>EHS / safety (2)</summary><ul><li>Sulfuric acid: pH &lt; 1 streams need Hastelloy/PTFE wetted parts; spill containment per OSHA HCS.</li><li>H2 is highly flammable, LEL 4 vol-%; ventilation + leak monitoring + ATEX.</li></ul></details></div>
+
+  <div class="card">
+    <h2>📦 Streams & makeup (per batch)</h2>
+    <p class="small" style="color:var(--muted);margin-top:-2px">
+      The PFD shows ONE arrow per reagent. The breakdown of how much is loaded
+      once (initial charge) vs replenished continuously (makeup at the drag-out
+      rate) is here.
+    </p>
+    <table>
+      <tr><th>Stream</th><th>Role</th><th class="num">g/batch</th>
+          <th class="num">Recovery</th><th>Behaviour</th></tr>
+      <tr><td>PET</td><td>input</td><td class='num'>0.1</td><td class='num'>0.00</td><td>continuous (single-pass)</td></tr><tr><td>PMA</td><td>input</td><td class='num'>9.12625</td><td class='num'>1.00</td><td>continuous: initial charge + 0.0% / batch makeup (recovery 100%)</td></tr><tr><td>H2SO4</td><td>input</td><td class='num'>0.4904</td><td class='num'>1.00</td><td>continuous: initial charge + 0.0% / batch makeup (recovery 100%)</td></tr><tr><td>DMSO</td><td>input</td><td class='num'>5.5</td><td class='num'>1.00</td><td>continuous: initial charge + 0.1% / batch makeup (recovery 100%)</td></tr><tr><td>H2O</td><td>input</td><td class='num'>4.8096</td><td class='num'>0.00</td><td>continuous (single-pass)</td></tr><tr><td>TPA</td><td>output</td><td class='num'>0.0863876</td><td class='num'>—</td><td>product</td></tr><tr><td>FA</td><td>output</td><td class='num'>0.0405064</td><td class='num'>—</td><td>product</td></tr><tr><td>H2</td><td>output</td><td class='num'>0.00532224</td><td class='num'>—</td><td>product</td></tr>
+    </table>
+  </div>
+
+  <div class='card'><h2>📚 Chemical price references</h2><table><tr><th>Component</th><th class='num'>Active $/kg</th><th>Active source</th><th>Other sources on file</th></tr><tr><td>DMSO</td><td class='num'>$1.50</td><td>Echemi 2024</td><td class='small' style='color:var(--muted)'>Sigma bulk 2024 $2.50; Made-in-China spot 2024 $1.20</td></tr><tr><td>FA</td><td class='num'>$0.84</td><td>ICIS 2024 formic acid 2024</td><td class='small' style='color:var(--muted)'>Echemi spot 2017-2024 low 2024 $0.53; Echemi spot 2017-2024 high 2024 $1.57</td></tr><tr><td>H2</td><td class='num'>$2.00</td><td>Grey H2 baseline 2024</td><td class='small' style='color:var(--muted)'>Blue H2 typical 2024 $4.00; Green H2 PEM electrolysis 2024 $6.00; Hydrogen Council 2024 reference 2024 $8.00</td></tr><tr><td>H2O</td><td class='num'>$0.00</td><td>Nat Commun 12, 4679 (2021)</td><td class='small' style='color:var(--muted)'></td></tr><tr><td>H2SO4</td><td class='num'>$0.04</td><td>Made-in-China bulk 2024</td><td class='small' style='color:var(--muted)'>ICIS contract Europe 2024 $0.10; USGS commodity 2024 2024 $0.05</td></tr><tr><td>PET</td><td class='num'>$0.10</td><td>Recycling Market 2024 (waste PET 0.10; virgin/recycled 0.25-0.40 ICIS 2024)</td><td class='small' style='color:var(--muted)'></td></tr><tr><td>PMA</td><td class='num'>$0.01</td><td>Made-in-China bulk 2024</td><td class='small' style='color:var(--muted)'>Industrial reagent estimate 2024 $0.05; Sigma reagent grade 2024 $2.00</td></tr><tr><td>TPA</td><td class='num'>$0.94</td><td>ICIS 2024 virgin TPA 2024</td><td class='small' style='color:var(--muted)'>Market price virgin TPA 2024 $0.92; Recycled TPA premium 2024 $1.20</td></tr></table></div>
+
+  <div class="card">
+    <h2>🛠️ Equipment</h2>
+    <table>
+      <tr><th>Section</th><th>Equipment</th><th class="num">Base cost ($)</th>
+          <th>Source</th><th>Lifetime</th></tr>
+      <tr><td>Feedstock Pretreatment</td><td>Conveyor transfer system</td><td class='num'>$3,292,110</td><td>default</td><td>permanent</td></tr><tr><td>Feedstock Pretreatment</td><td>Truck dumper package</td><td class='num'>$188,213</td><td>default</td><td>permanent</td></tr><tr><td>Feedstock Pretreatment</td><td>Dust collection system</td><td class='num'>$47,598</td><td>default</td><td>permanent</td></tr><tr><td>Feedstock Pretreatment</td><td>Feedstock storage dome</td><td class='num'>$595,185</td><td>default</td><td>permanent</td></tr><tr><td>Feedstock Pretreatment</td><td>Shredder</td><td class='num'>$175,754</td><td>default</td><td>permanent</td></tr><tr><td>Feedstock Pretreatment</td><td>Extruder</td><td class='num'>$2,016,685</td><td>default</td><td>permanent</td></tr><tr><td>Feedstock Pretreatment</td><td>Microgranulator</td><td class='num'>$564,334</td><td>default</td><td>permanent</td></tr><tr><td>PET Depolymerization</td><td>Small particle conveyor</td><td class='num'>$403,960</td><td>default</td><td>permanent</td></tr><tr><td>PET Depolymerization</td><td>PMA storage and transfer</td><td class='num'>$285,764</td><td>default</td><td>permanent</td></tr><tr><td>PET Depolymerization</td><td>Water recirculation pump</td><td class='num'>$7,266</td><td>default</td><td>permanent</td></tr><tr><td>PET Depolymerization</td><td>Depolymerization reactor (×7)</td><td class='num'>$5,689,918</td><td>default</td><td>permanent</td></tr><tr><td>PET Depolymerization</td><td>Storage tanks</td><td class='num'>$97,625</td><td>default</td><td>permanent</td></tr><tr><td>PET Depolymerization</td><td>Reactor effluent cooler</td><td class='num'>$42,058</td><td>default</td><td>permanent</td></tr><tr><td>PET Depolymerization</td><td>Caustic storage and transfer</td><td class='num'>$134,650</td><td>default</td><td>permanent</td></tr><tr><td>TPA Filtration &amp; Crystallization</td><td>Solids filter package</td><td class='num'>$1,927,537</td><td>default</td><td>permanent</td></tr><tr><td>TPA Filtration &amp; Crystallization</td><td>rTPA crystallizer</td><td class='num'>$3,530,858</td><td>default</td><td>permanent</td></tr><tr><td>TPA Filtration &amp; Crystallization</td><td>rTPA centrifuge</td><td class='num'>$723,956</td><td>default</td><td>permanent</td></tr><tr><td>TPA Filtration &amp; Crystallization</td><td>rTPA crystals dryer</td><td class='num'>$681,880</td><td>default</td><td>permanent</td></tr><tr><td>Electrolysis</td><td>Electrolyzer</td><td class='num'>$5,958,392</td><td>default</td><td>permanent</td></tr><tr><td>Electrolysis</td><td>H2 storage tank</td><td class='num'>$384,001</td><td>default</td><td>permanent</td></tr>
+    </table>
+  </div>
+
+  <div class='card'><h2>📚 Assumptions &amp; References</h2><p class='small' style='color:var(--muted)'>Every sourced number carries an inline [n] marker linking to the numbered reference list below.</p><h3 style='margin:14px 0 6px'>Feedstock &amp; reagent prices</h3><table><tr><th>Component</th><th class='num'>$/kg</th><th>Ref</th></tr><tr><td>PET</td><td class='num'>$0.1/kg</td><td><sup><a href='#ref-2' style='text-decoration:none;color:var(--accent)'>[2]</a></sup></td></tr><tr><td>PMA</td><td class='num'>$0.01/kg</td><td><sup><a href='#ref-4' style='text-decoration:none;color:var(--accent)'>[4]</a></sup></td></tr><tr><td>H2SO4</td><td class='num'>$0.037/kg</td><td><sup><a href='#ref-4' style='text-decoration:none;color:var(--accent)'>[4]</a></sup></td></tr><tr><td>DMSO</td><td class='num'>$1.5/kg</td><td><sup><a href='#ref-5' style='text-decoration:none;color:var(--accent)'>[5]</a></sup></td></tr><tr><td>H2O</td><td class='num'>$0.00022/kg</td><td><sup><a href='#ref-6' style='text-decoration:none;color:var(--accent)'>[6]</a></sup></td></tr></table><h3 style='margin:18px 0 6px'>Key assumptions</h3><table><tr><th>Assumption</th><th class='num'>Value</th><th>Ref</th></tr><tr><td>electrolyzer_cost_usd_per_m2</td><td class='num'>10000 $/m^2</td><td><sup><a href='#ref-6' style='text-decoration:none;color:var(--accent)'>[6]</a></sup></td></tr><tr><td>electricity_price_usd_per_kWh</td><td class='num'>0.0953 $/kWh</td><td><sup><a href='#ref-7' style='text-decoration:none;color:var(--accent)'>[7]</a></sup></td></tr><tr><td>steam_price_usd_per_GJ</td><td class='num'>4.77 $/GJ</td><td><sup><a href='#ref-8' style='text-decoration:none;color:var(--accent)'>[8]</a></sup></td></tr><tr><td>fa_distillation_capex_usd_per_kg</td><td class='num'>0.0884 $/kg FA</td><td><sup><a href='#ref-9' style='text-decoration:none;color:var(--accent)'>[9]</a></sup></td></tr><tr><td>fa_distillation_opex_usd_per_kg</td><td class='num'>0.8633 $/kg FA</td><td><sup><a href='#ref-9' style='text-decoration:none;color:var(--accent)'>[9]</a></sup></td></tr><tr><td>maintenance_fraction_of_capex</td><td class='num'>0.1</td><td><sup><a href='#ref-6' style='text-decoration:none;color:var(--accent)'>[6]</a></sup></td></tr><tr><td>operation_fraction_of_capex</td><td class='num'>0.1</td><td><sup><a href='#ref-6' style='text-decoration:none;color:var(--accent)'>[6]</a></sup></td></tr><tr><td>dmso_recovery_pct</td><td class='num'>99.0 %</td><td><sup><a href='#ref-1' style='text-decoration:none;color:var(--accent)'>[1]</a></sup></td></tr><tr><td>current_density_mA_cm2</td><td class='num'>125 mA/cm^2</td><td><sup><a href='#ref-1' style='text-decoration:none;color:var(--accent)'>[1]</a></sup></td></tr></table><h3 style='margin:18px 0 6px'>References</h3><table><tr><th>#</th><th>Citation</th><th>Type</th></tr><tr id='ref-1'><td class='num'>[1]</td><td>Oh, Lee, Lee et al., Green Chem. 2026, 28, 3573 (this paper) · <a href='https://doi.org/10.1039/d5gc04677g' target='_blank'>doi:10.1039/d5gc04677g</a></td><td class='small' style='color:var(--muted)'>literature</td></tr><tr id='ref-2'><td class='num'>[2]</td><td>Post-consumer / waste PET recycling market price, 2024</td><td class='small' style='color:var(--muted)'>market</td></tr><tr id='ref-3'><td class='num'>[3]</td><td>ICIS Chemical Business — PET contract price, 2024</td><td class='small' style='color:var(--muted)'>market</td></tr><tr id='ref-4'><td class='num'>[4]</td><td>Made-in-China.com industrial bulk quotes (PMA, H2SO4), 2024</td><td class='small' style='color:var(--muted)'>vendor</td></tr><tr id='ref-5'><td class='num'>[5]</td><td>Echemi market price — DMSO, 2024</td><td class='small' style='color:var(--muted)'>market</td></tr><tr id='ref-6'><td class='num'>[6]</td><td>Na, Seh et al., Nat. Commun. 12, 4679 (2021) · <a href='https://doi.org/10.1038/s41467-021-25214-1' target='_blank'>doi:10.1038/s41467-021-25214-1</a></td><td class='small' style='color:var(--muted)'>literature</td></tr><tr id='ref-7'><td class='num'>[7]</td><td>KEPCO industrial electricity tariff, 2024</td><td class='small' style='color:var(--muted)'>market</td></tr><tr id='ref-8'><td class='num'>[8]</td><td>Turton et al., Analysis, Synthesis &amp; Design of Chemical Processes, 5th ed. (2018)</td><td class='small' style='color:var(--muted)'>literature</td></tr><tr id='ref-9'><td class='num'>[9]</td><td>Ind. Eng. Chem. Res. 2021, 60, 5588–5599</td><td class='small' style='color:var(--muted)'>literature</td></tr><tr id='ref-10'><td class='num'>[10]</td><td>Joule 5, 2479–2503 (2021)</td><td class='small' style='color:var(--muted)'>literature</td></tr></table></div>
+
+</div>
+
+<footer>
+  Generated by tea_tool · 2026-05-29 16:40<br>
+  Diagrams &amp; charts load from the local <code>vendor/</code> folder (works
+  offline); if this file is moved on its own, they fall back to a CDN.
+</footer>
+
+<script>
+  // ---------- theme ----------
+  function toggleTheme() {
+    const cur = document.documentElement.getAttribute("data-theme");
+    const next = (cur === "dark") ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    localStorage.setItem("tea-theme", next);
+    location.reload();
+  }
+  const saved = localStorage.getItem("tea-theme");
+  if (saved) document.documentElement.setAttribute("data-theme", saved);
+
+  // ---------- robust loader: local vendor first, CDN fallback ----------
+  function loadScript(local, cdn, cb) {
+    var s = document.createElement("script");
+    s.src = local;
+    s.onload = cb;
+    s.onerror = function () {
+      var c = document.createElement("script");
+      c.src = cdn; c.onload = cb;
+      c.onerror = function () { console.warn("tea_tool: could not load " + local + " (and CDN failed)"); };
+      document.head.appendChild(c);
+    };
+    document.head.appendChild(s);
+  }
+
+  // ---------- PFD zoom / fit (independent of mermaid loading) ----------
+  function setScale(s) {
+    const svg = document.querySelector("#pfd-host svg");
+    if (!svg) return;
+    document.documentElement.style.setProperty("--pfd-scale", String(s));
+    const host = document.getElementById("pfd-host");
+    host.scrollLeft = host.scrollLeft;
+  }
+  function currentScale() {
+    return parseFloat(
+      getComputedStyle(document.documentElement).getPropertyValue("--pfd-scale") || 1
+    ) || 1;
+  }
+  function fitToWidth() {
+    const svg = document.querySelector("#pfd-host svg");
+    const host = document.getElementById("pfd-host");
+    if (!svg || !host) return;
+    const vb = (svg.getAttribute("viewBox") || "").split(/\s+/).map(Number);
+    const nat = (vb.length === 4 && vb[2]) ? vb[2] : svg.clientWidth;
+    if (!nat) return;
+    const fit = (host.clientWidth - 20) / nat;
+    setScale(Math.max(0.2, Math.min(3, fit)));
+  }
+  window.addEventListener("resize", () => setTimeout(fitToWidth, 100));
+  window.pfdZoom = (factor) => setScale(currentScale() * factor);
+  window.pfdReset = () => fitToWidth();
+  window.pfdFullscreen = () => {
+    const card = document.getElementById("pfd-card");
+    card.classList.toggle("pfd-fullscreen");
+    setTimeout(fitToWidth, 200);
+  };
+
+  // ---------- mermaid (called once mermaid.min.js has loaded) ----------
+  function pickMermaidTheme() {
+    const t = document.documentElement.getAttribute("data-theme");
+    if (t === "dark") return "dark";
+    if (t === "light") return "default";
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "default";
+  }
+  function initMermaid() {
+    if (!window.mermaid) return;
+    try {
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: pickMermaidTheme(),
+        securityLevel: "loose",
+        flowchart: { htmlLabels: true, curve: "basis", nodeSpacing: 50,
+                     rankSpacing: 80, padding: 14, useMaxWidth: false },
+        themeVariables: { fontSize: "15px" }
+      });
+      var p = mermaid.run ? mermaid.run({ querySelector: ".mermaid" }) : null;
+      if (p && p.then) p.then(() => setTimeout(fitToWidth, 300));
+      else setTimeout(fitToWidth, 500);
+    } catch (e) { try { mermaid.init(); setTimeout(fitToWidth, 500); } catch (e2) {} }
+  }
+
+  // ---------- charts (called once chart.umd.min.js has loaded) ----------
+  const SENSITIVITY_DATA = {"PMA recovery \u2192 MSP": [[0.999, 0.6652203028955976], [0.99, 0.6747281778683948], [0.95, 0.7169853999697147], [0.9, 0.7698069275963648]], "DMSO price \u2192 MSP": [[3.0, 0.7596636894464454], [2.25, 0.7119137808947549], [1.5, 0.6641638723430646], [0.75, 0.6164139637913743]]};
+  function initCharts() {
+    if (!window.Chart) return;
+    const txt = getComputedStyle(document.documentElement).getPropertyValue("--fg").trim();
+    const acc = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim();
+    for (const [title, points] of Object.entries(SENSITIVITY_DATA)) {
+      const id = "chart_" + title.replace(/[^a-zA-Z0-9]/g, "_");
+      const el = document.getElementById(id);
+      if (!el) continue;
+      new Chart(el, {
+        type: "line",
+        data: { labels: points.map(p => p[0]),
+          datasets: [{ label: "MSP ($/kg)", data: points.map(p => p[1]),
+            borderColor: acc, backgroundColor: acc + "33", tension: 0.3, pointRadius: 5 }] },
+        options: { responsive: true, maintainAspectRatio: false,
+          scales: { x: { ticks: { color: txt } },
+                    y: { ticks: { color: txt }, title: { display: true, text: "MSP ($/kg)", color: txt } } },
+          plugins: { legend: { display: false } } }
+      });
+    }
+  }
+
+  // ---------- kick off (local-first, CDN fallback) ----------
+  loadScript("vendor/mermaid.min.js",
+             "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js", initMermaid);
+  loadScript("vendor/chart.umd.min.js",
+             "https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js", initCharts);
+</script>
+</body>
+</html>

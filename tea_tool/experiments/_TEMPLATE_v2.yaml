@@ -1,0 +1,134 @@
+# ============================================================================
+# v2 EXPERIMENT TEMPLATE — copy to experiments/<slug>.yaml and fill in.
+# Files starting with "_" are skipped by the dossier generator / validator,
+# so this template is never built as a paper.
+#
+# Validate while you fill it:   python -m tea_engine.validate_cli experiments/<slug>.yaml
+# A clean v2 file reports:      schema v2 — OK | refs N/N priced inputs sourced | PFD yes
+#
+# The worked reference is experiments/paper_oh_2026_pet_pma.yaml — copy its
+# structure. See experiments/SCHEMA.md §"Bring a paper to dossier standard".
+# ============================================================================
+schema_version: 2
+
+meta:
+  name: "<Short title — Author Year, Journal>"
+  slug: "<file_safe_id>"            # must match the filename
+  date: 2026-01-01
+  researcher: "<authors>"
+  lab: "<lab>"
+  notes: |
+    <1-3 sentences: what the process does, key result, headline MSP.>
+
+# --- References registry: every sourced number points here via *_ref / ref ---
+references:
+  - id: feedstock_src
+    citation: "<market report / vendor / paper for the feedstock price>"
+    type: market                    # market | literature | vendor | assumption | internal
+    url: "<optional url>"
+  - id: paper
+    citation: "<the source paper, Author et al., Journal Year>"
+    type: literature
+    doi: "<10.xxxx/...>"
+  - id: electricity_src
+    citation: "<electricity tariff source>"
+    type: market
+  - id: steam_src
+    citation: "Turton et al., Analysis, Synthesis & Design of Chemical Processes, 5th ed. (2018)"
+    type: literature
+
+chemistry:
+  reaction_type: "electrochemical"  # thermal | catalytic | electrochemical | photochemical | biological | hybrid
+  description: |
+    <reaction narrative>
+  reactions:
+    - {lhs: "<A + B>", rhs: "<C + D>", role: "main"}
+  target_products: ["<primary>", "<co-product>"]
+
+feedstock:
+  primary:
+    name: "<feed>"
+    mass_per_batch_g: 1.0
+    purity_pct: 100
+    price_usd_per_kg: 0.0
+    price_ref: feedstock_src        # <-- every price MUST cite a references[].id
+    source_note: "<note>"
+  reagents:
+    - {name: "<reagent>", mass_per_batch_g: 0.0, recovery_fraction: 0.0,
+       role: "reactant", price_usd_per_kg: 0.0, price_ref: feedstock_src}
+
+operating_conditions:
+  temperature_C: 25
+  pressure_bar: 1
+  reaction_time_h: 1.0
+  electrochem:                       # delete if not electrochemical
+    cell_voltage_V: 1.2
+    current_density_mA_cm2: 100
+    faradaic_efficiency_pct: 90
+
+results:
+  yields:
+    - {product: "<primary>", yield_pct: 90}
+  conversion_pct: 90
+
+downstream:
+  - {step: "<separation>", method: "<method>", recovery_pct: 95}
+
+# --- Standalone assumptions: each sourced (drives Energy-OPEX basis table) ---
+assumptions:
+  - {key: "electricity_price_usd_per_kWh", value: 0.0953, unit: "$/kWh", ref: electricity_src}
+  - {key: "steam_price_usd_per_GJ", value: 4.77, unit: "$/GJ", ref: steam_src}
+
+# --- PFD spec: units (with conditions) + classed streams + initial/makeup ----
+# This is what the dossier draws (correct by construction). Stream endpoints are
+# unit keys, or in:<feed> / out:<product>. kind: feed|intermediate|recycle|product.
+pfd:
+  units:
+    - {key: rxn, label: "<Reactor>", kind: "Electrochemical Cell",
+       conditions: {T_C: 25, V_cell: 1.2, j_mA_cm2: 100, FE_pct: 90}}
+    - {key: sep, label: "<Separation>", kind: "Distillation Column",
+       conditions: {T_C: 100, note: "<duty/recovery>"}}
+  streams:
+    - {from: "in:<feed>", to: rxn, label: "<feed>", kind: feed}
+    - {from: rxn, to: sep, label: "<crude>", kind: intermediate}
+    - {from: sep, to: rxn, label: "<recovered solvent>", kind: recycle}
+    - {from: sep, to: "out:<primary>", label: "<primary>", kind: product}
+  charges:
+    - {stream: "<catalyst>", kind: initial, note: "one-time charge"}
+    - {stream: "<solvent>", kind: makeup, note: "recovered; makeup for losses"}
+
+constraints:
+  preferred_msp_product: "<primary>"   # which product's MSP is reported
+  plant_lifetime_years: 20
+  discount_rate: 0.10
+
+scale_targets:
+  scales_ton_per_batch: [0.1, 1.0, 5.0, 10.0]
+  capacity_factor: 0.85
+  batch_hours: 2.0
+
+# --- Optional: paper's own numbers for cross-check (shown as "paper: $x/kg") --
+reported:
+  msp_usd_per_kg: 0.0
+  source: "<paper citation>"
+
+# --- Optional: product-strategy scenarios (auto-builds the comparison page) ---
+# Delete this block if the paper makes a single product. Otherwise list the
+# variable co-products; the dossier shows "recover & sell vs. don't" per product.
+scenarios:
+  basis_scale_ton: 10.0
+  primary_product: "<primary>"
+  base_coproducts: []                # always-sold co-products (e.g. ["H2"])
+  base_opex_excludes_usd_per_ton: 0  # OPEX baked into the builder for a variable co-product
+  variable_coproducts:
+    - key: "<CoP>"
+      name: "<Co-product name>"
+      kg_per_kg_feed: 0.0
+      amount_basis: "[stoich/est] <how this amount was estimated>"
+      price_usd_kg: 0.0
+      price_ref: feedstock_src
+      sep_capex_usd_per_kg: 0.0884   # IECR-2021 distillation correlation proxy
+      sep_opex_usd_per_kg: 0.8633
+      sep_difficulty: 1.0            # multiplier for hard separations
+      sep_ref: steam_src
+      feasibility: "<bp / azeotrope / dilute-aqueous note>"

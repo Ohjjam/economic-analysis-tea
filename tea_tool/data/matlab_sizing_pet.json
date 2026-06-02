@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-05-29T04:08:37Z",
+  "generated_by": "python_physics_fallback",
+  "process": "pet_depolymerization",
+  "design_point_ton_per_batch": 1.0,
+  "batch_hours": 2.0,
+  "capacity_factor": 0.8,
+  "batches_per_year": 3504.0,
+  "electrolyzer": {
+    "h2_production_kg_per_batch": 53.2224,
+    "current_density_mA_cm2": 125.0,
+    "cell_voltage_V": 1.2,
+    "faradaic_efficiency": 0.95,
+    "electrons_per_h2": 2,
+    "required_current_A": 744799.0549614036,
+    "required_area_m2": 595.8392439691229,
+    "area_cost_usd_per_m2": 10000.0,
+    "base_cost_usd": 5958392.439691229,
+    "specific_energy_kWh_per_kg_H2": 31.906525171957675,
+    "electricity_price_usd_per_kWh": 0.0953,
+    "electricity_usd_per_t_feed_per_y": 567062.5441752506
+  },
+  "reactor_heat": {
+    "T_feed_C": 25.0,
+    "T_react_C": 180.0,
+    "delta_T_K": 155.0,
+    "sigma_mCp_kJ_per_K_per_t": 312662.64,
+    "heat_recovery_fraction": 0.6667,
+    "Q_heating_GJ_per_batch": 48.462709200000006,
+    "Q_net_GJ_per_batch": 16.152620976360005,
+    "steam_price_usd_per_GJ": 4.77,
+    "heat_usd_per_t_feed_per_y": 269976.19920855924
+  }
+}

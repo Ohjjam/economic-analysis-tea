@@ -1,0 +1,87 @@
+# Paper: Sun et al., Angewandte Chemie 63, e202414417 (2024).
+# "Pairing Oxygen Reduction and Water Oxidation for Dual-Pathway H2O2 Production"
+meta:
+  name: "Sun 2024 — Dual-pathway H2O2 (2e-ORR + 2e-WOR)"
+  slug: "paper_sun_2024_h2o2_dualpath"
+  date: 2024-09-25
+  researcher: "Sun et al. (Angew Chem)"
+  lab: "BUCT (paper reproduction)"
+  notes: |
+    Dual-pathway H2O2 — cathode does 2e-ORR (O2 -> H2O2),
+    anode does 2e-WOR (H2O -> H2O2). Both electrodes produce H2O2.
+    Each kWh produces ~2× H2O2 vs single-pathway alkaline ORR.
+
+chemistry:
+  reaction_type: "electrochemical"
+  description: |
+    Two-electrode H2O2 production: cathode reduces O2 (2e- ORR);
+    anode oxidises water (2e- WOR). Both half-cells produce H2O2.
+  reactions:
+    - lhs: "O2 + 2 H+ + 2 e-"
+      rhs: "H2O2"
+      role: "cathode (2e-ORR)"
+    - lhs: "2 H2O"
+      rhs: "H2O2 + 2 H+ + 2 e-"
+      role: "anode (2e-WOR)"
+  target_products:
+    - "H2O2"
+
+feedstock:
+  primary:
+    name: "O2"
+    mass_per_batch_g: 40.0
+    price_usd_per_kg: 0.032
+    source_note: "Air-separation O2"
+  reagents:
+    - name: "KOH"
+      mass_per_batch_g: 2.8
+      recovery_fraction: 0.99
+      role: "solvent"
+      price_usd_per_kg: 0.57
+    - name: "H2O"
+      mass_per_batch_g: 100.0
+      recovery_fraction: 0.99
+      role: "utility"
+      price_usd_per_kg: 0.00022
+
+operating_conditions:
+  temperature_C: 25
+  pressure_bar: 1
+  ph: 13
+  reaction_time_h: 1.0
+  electrochem:
+    cell_voltage_V: 1.55
+    current_density_mA_cm2: 250
+    faradaic_efficiency_pct: 90      # combined dual-pathway
+    electrode_area_cm2: 1.0
+    electrolyte: "0.5 M KOH"
+    membrane: "AEM"
+
+results:
+  yields:
+    - product: "H2O2"
+      yield_pct: 8.5             # nearly 2x single-pathway baseline
+      selectivity_pct: 90
+  conversion_pct: 20
+
+downstream:
+  - step: "H2O2 polishing"
+    method: "Vacuum distillation"
+    recovery_pct: 95
+    target_purity_pct: 30
+
+constraints:
+  preferred_msp_product: "H2O2"
+  hazardous_materials: ["h2o2", "koh"]
+  scale_up_priority: "opex"
+  plant_lifetime_years: 20
+  discount_rate: 0.08
+
+scale_targets:
+  scales_ton_per_batch: [0.001, 0.01, 0.1, 1.0, 10.0]
+  capacity_factor: 0.92
+  batch_hours: 1.0
+
+reported:
+  msp_usd_per_kg: 0.79
+  source: "Sun et al., Angew Chem e202414417 (2024); ~2× efficiency vs single-pathway"

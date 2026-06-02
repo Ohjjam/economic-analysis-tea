@@ -1,0 +1,109 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "tea_tool/matlab/sizing_schema.json",
+  "title": "TEA physics sizing artifact (data/matlab_sizing.json)",
+  "description": "SINGLE SOURCE OF TRUTH for the JSON contract shared by matlab/run_sizing.m and tea_engine/physics/run_sizing.py, and consumed by processes/spent_lfp_ballmill_li.py. Bump schema_version on any breaking change and add it to _SCHEMA_SUPPORTED in the consumer.",
+  "type": "object",
+  "required": ["schema_version", "process", "ball_mill", "leach_tank", "evaporator"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["1.0"]},
+    "generated_at":   {"type": "string"},
+    "generated_by":   {"type": "string"},
+    "process":        {"type": "string"},
+    "design_point_ton_per_batch": {"type": "number", "exclusiveMinimum": 0},
+    "target_recovery":  {"type": "number", "minimum": 0, "maximum": 1},
+    "batch_hours":      {"type": "number", "exclusiveMinimum": 0},
+    "capacity_factor":  {"type": "number", "exclusiveMinimum": 0, "maximum": 1},
+    "batches_per_year": {"type": "number", "exclusiveMinimum": 0},
+    "scales_ton": {"type": "array", "items": {"type": "number"}},
+
+    "ball_mill": {
+      "type": "object",
+      "required": ["kWh_per_t_feed", "motor_kW_at_design_point", "base_cost_usd",
+                   "cooling_water_usd_per_t_feed_per_y"],
+      "properties": {
+        "kWh_per_t_feed":                     {"type": "number", "minimum": 0},
+        "kWh_per_t_feed_by_scale": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["scale_ton", "kWh_per_t"],
+            "properties": {
+              "scale_ton": {"type": "number"},
+              "kWh_per_t": {"type": "number"}
+            }
+          }
+        },
+        "specific_energy_is_intensive":       {"type": "boolean"},
+        "drivetrain_credit_at_design":        {"type": "number"},
+        "motor_kW_at_design_point":           {"type": "number", "minimum": 0},
+        "base_cost_usd":                      {"type": "number", "minimum": 0},
+        "bond_comminution_kWh_per_t":         {"type": "number", "minimum": 0},
+        "bond_fraction_of_total":             {"type": "number", "minimum": 0, "maximum": 1},
+        "mill_diameter_m":                    {"type": "number", "minimum": 0},
+        "mill_length_m":                      {"type": "number", "minimum": 0},
+        "mill_volume_m3":                     {"type": "number", "minimum": 0},
+        "ball_charge_kg":                     {"type": "number", "minimum": 0},
+        "specific_power_kW_per_m3":           {"type": "number", "minimum": 0},
+        "critical_speed_rpm":                 {"type": "number"},
+        "operating_speed_rpm":                {"type": "number"},
+        "geometry_is_readout_only":           {"type": "boolean"},
+        "bond_work_index_kWh_per_t":          {"type": "number"},
+        "feed_size_F80_um":                   {"type": "number"},
+        "product_size_P80_um":                {"type": "number"},
+        "activation_multiplier":              {"type": "number"},
+        "mill_efficiency":                    {"type": "number"},
+        "mechanochem_intensity_factor":       {"type": "number"},
+        "heat_load_kW_at_design_point":       {"type": "number"},
+        "cooling_water_kg_per_t_feed":        {"type": "number"},
+        "cooling_water_usd_per_t_feed_per_y": {"type": "number", "minimum": 0}
+      }
+    },
+
+    "leach_tank": {
+      "type": "object",
+      "required": ["target_recovery", "residence_time_h", "reactor_volume_m3",
+                   "base_cost_usd"],
+      "properties": {
+        "target_recovery":       {"type": "number", "minimum": 0, "maximum": 1},
+        "reference_recovery":    {"type": "number", "minimum": 0, "maximum": 1},
+        "kinetic_model":         {"type": "string", "enum": ["first_order", "scm_ash"]},
+        "rate_constant":         {"type": "number"},
+        "residence_time_h":      {"type": "number", "minimum": 0},
+        "residence_time_ref_h":  {"type": "number", "minimum": 0},
+        "reactor_volume_m3":     {"type": "number", "minimum": 0},
+        "reactor_volume_ref_m3": {"type": "number", "minimum": 0},
+        "safety_factor":         {"type": "number", "minimum": 1},
+        "base_cost_usd":         {"type": "number", "minimum": 0},
+        "base_cost_usd_orig":    {"type": "number", "minimum": 0},
+        "cost_scaling_factor":   {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    },
+
+    "evaporator": {
+      "type": "object",
+      "required": ["effects", "Q_evap_MJ_per_batch", "lps_steam_kg_per_batch",
+                   "lps_steam_usd_per_t_feed_per_y", "base_cost_usd"],
+      "properties": {
+        "feed_water_kg_per_batch":         {"type": "number", "minimum": 0},
+        "evaporation_target_fraction":     {"type": "number", "minimum": 0, "maximum": 1},
+        "effects":                         {"type": "integer", "minimum": 1},
+        "Q_evap_MJ_per_batch":             {"type": "number", "minimum": 0},
+        "lps_steam_kg_per_batch":          {"type": "number", "minimum": 0},
+        "lps_steam_kg_per_t_feed_per_y":   {"type": "number", "minimum": 0},
+        "lps_steam_usd_per_t_feed_per_y":  {"type": "number", "minimum": 0},
+        "lps_price_usd_per_ton":           {"type": "number", "minimum": 0},
+        "heat_transfer_area_m2":           {"type": "number", "minimum": 0},
+        "single_effect_area_m2":           {"type": "number", "minimum": 0},
+        "U_W_per_m2K":                     {"type": "number", "minimum": 0},
+        "deltaT_total_K":                  {"type": "number", "minimum": 0},
+        "area_cost_usd_per_m2":            {"type": "number", "minimum": 0},
+        "base_cost_usd":                   {"type": "number", "minimum": 0},
+        "boiler_feed_T_C":                 {"type": "number"},
+        "boil_T_C":                        {"type": "number"},
+        "specific_heat_water_kJ_per_kg_K": {"type": "number"},
+        "latent_heat_vap_kJ_per_kg":       {"type": "number"}
+      }
+    }
+  }
+}

@@ -1,0 +1,120 @@
+# Paper: Comparative TEA + LCA of electrocatalytic lignin valorization
+# (Green Chemistry 2024, doi:10.1039/D4GC01963F).
+# HAT (hydrogen atom transfer) mediator for benzylic oxidation of lignin.
+meta:
+  name: "HAT-mediated electrocatalytic lignin valorization (Green Chem 2024)"
+  slug: "paper_blanc_2024_lignin_hat"
+  date: 2024-09-16
+  researcher: "Blanc, Wartmann et al. (Green Chem)"
+  lab: "Washington University in St. Louis"
+  notes: |
+    Comparative TEA + LCA of electrocatalytic processes for lignin
+    valorization. HAT mediator under milder conditions vs PMA route.
+    Bulk chemicals MSP $16.86/kg vs vanillin market $25/kg.
+    Uses BioSTEAM + GREET 2022 for analysis.
+
+chemistry:
+  reaction_type: "electrochemical"
+  description: |
+    HAT-mediator-driven benzylic oxidation of Kraft lignin in
+    moderate conditions. Cathode HER, anode lignin oxidation with
+    HAT mediator regeneration.
+  reactions:
+    - lhs: "Lignin + HAT(ox)"
+      rhs: "Aromatic monomers + HAT(red)"
+      role: "anode-mediated"
+    - lhs: "HAT(red)"
+      rhs: "HAT(ox) + e-"
+      role: "regeneration"
+  target_products:
+    - "Vanillin"
+    - "Bulk aromatic mixture"
+    - "H2"
+
+feedstock:
+  primary:
+    name: "Organosolv Lignin"
+    mass_per_batch_g: 5.0
+    purity_pct: 90
+    price_usd_per_kg: 0.40
+    source_note: "Kraft lignin"
+  reagents:
+    - name: "HAT mediator"
+      mass_per_batch_g: 0.5
+      recovery_fraction: 0.99
+      role: "catalyst"
+      price_usd_per_kg: 100.0
+    - name: "KOH"
+      mass_per_batch_g: 2.8
+      recovery_fraction: 0.99
+      role: "solvent"
+      price_usd_per_kg: 0.57
+    - name: "H2O"
+      mass_per_batch_g: 80.0
+      recovery_fraction: 0.99
+      role: "utility"
+      price_usd_per_kg: 0.00022
+    - name: "2-MeTHF"
+      mass_per_batch_g: 12.0
+      recovery_fraction: 0.99
+      role: "solvent"
+      price_usd_per_kg: 8.0
+
+operating_conditions:
+  temperature_C: 60
+  pressure_bar: 1
+  ph: 13
+  reaction_time_h: 6.0
+  electrochem:
+    cell_voltage_V: 1.3
+    current_density_mA_cm2: 80
+    faradaic_efficiency_pct: 85
+    electrode_area_cm2: 1.0
+    electrolyte: "0.5 M KOH"
+    membrane: "AEM"
+
+results:
+  yields:
+    - product: "Vanillin"
+      yield_pct: 8.0
+      selectivity_pct: 45
+    - product: "Bulk aromatic mixture"
+      yield_pct: 22.0
+      selectivity_pct: 75
+    - product: "H2"
+      yield_pct: 0.6
+  conversion_pct: 65
+
+downstream:
+  - step: "2-MeTHF extraction"
+    method: "Liquid-liquid extraction"
+    solvent: "2-MeTHF"
+    solvent_loading_kg_per_kg_feed: 2.4
+    recovery_pct: 99
+  - step: "Solvent recovery"
+    method: "Distillation"
+    recovery_pct: 99
+  - step: "Vanillin pH-shift crystallization"
+    method: "Crystallization"
+    recovery_pct: 85
+    target_purity_pct: 98
+  - step: "H2 polishing"
+    method: "PSA"
+    recovery_pct: 98
+
+constraints:
+  preferred_msp_product: "Vanillin"
+  hazardous_materials: ["koh", "h2"]
+  scale_up_priority: "balanced"
+  plant_lifetime_years: 20
+  discount_rate: 0.10
+
+scale_targets:
+  scales_ton_per_batch: [0.001, 0.01, 0.1, 1.0, 10.0]
+  capacity_factor: 0.90
+  batch_hours: 6.0
+
+reported:
+  msp_usd_per_kg: 16.86
+  source: "Blanc et al., Green Chem 2024 (BioSTEAM + GREET 2022)"
+  market_reference: "Vanillin $25/kg"

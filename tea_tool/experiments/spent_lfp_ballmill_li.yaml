@@ -1,0 +1,95 @@
+# Experiment: Spent LFP Black Mass → Li2CO3 via mechanochemical ball-mill leach.
+meta:
+  name: "Spent LFP Black Mass to Li2CO3 (Mechanochemical, Li-only)"
+  slug: "spent_lfp_ballmill_li"
+  date: 2026-05-28
+  researcher: "Developer"
+  lab: "Battery Recycling Lab"
+  notes: |
+    Recover Li only from spent LFP black mass using mechanochemical ball-mill activation with NH4Cl,
+    followed by water leaching, purification, and precipitation with Na2CO3. Fe/P solid residues
+    are disposed to landfill.
+
+chemistry:
+  reaction_type: "thermal"
+  description: |
+    Mechanochemical ball-mill activation of LFP black mass with NH4Cl reagent, water leach,
+    S/L separation, AC/IX polish, Na2CO3 precipitation -> battery-grade Li2CO3. Fe/P solid waste
+    is landfilled.
+  reactions:
+    - lhs: "LiFePO4 + NH4Cl"
+      rhs: "LiCl + NH4FePO4"
+      role: "main"
+    - lhs: "2 LiCl + Na2CO3"
+      rhs: "Li2CO3 + 2 NaCl"
+      role: "precipitation"
+  target_products:
+    - "Li2CO3"
+
+feedstock:
+  primary:
+    name: "LFP Black Mass"
+    mass_per_batch_g: 1000.0
+    purity_pct: 100
+    price_usd_per_kg: 1.50
+    source_note: "Recycler black mass market average"
+  reagents:
+    - name: "NH4Cl"
+      mass_per_batch_g: 914.07
+      recovery_fraction: 0.0
+      role: "reactant"
+      price_usd_per_kg: 0.50
+    - name: "Na2CO3"
+      mass_per_batch_g: 329.88
+      recovery_fraction: 0.0
+      role: "reactant"
+      price_usd_per_kg: 0.30
+    - name: "H2O"
+      mass_per_batch_g: 5000.0
+      recovery_fraction: 0.80
+      role: "solvent"
+      price_usd_per_kg: 0.00022
+    - name: "Activated Carbon"
+      mass_per_batch_g: 10.0
+      recovery_fraction: 0.0
+      role: "consumable"
+      price_usd_per_kg: 2.00
+
+operating_conditions:
+  temperature_C: 25
+  pressure_bar: 1
+  ph: 7.0
+  reaction_time_h: 1.0
+  batch_volume_ml: 6000
+
+results:
+  yields:
+    - product: "Li2CO3"
+      yield_pct: 19.165
+  conversion_pct: 90
+  mass_balance_closure_pct: 95
+  energy_consumption_kWh_per_kg_product: null
+
+downstream:
+  - step: "Water Leach"
+    method: "Stirred leaching tank"
+  - step: "S/L Filtration"
+    method: "Pressure filter"
+  - step: "Li Solution Purification"
+    method: "Activated carbon column + IX"
+  - step: "Li2CO3 Crystallization"
+    method: "Crystallizer"
+  - step: "Final Drying"
+    method: "Dryer"
+
+constraints:
+  preferred_msp_product: "Li2CO3"
+  hazardous_materials: []
+  scale_up_priority: "balanced"
+  plant_lifetime_years: 15
+  discount_rate: 0.10
+
+scale_targets:
+  scales_ton_per_batch: [0.1, 1.0, 5.0]
+  capacity_factor: 0.85
+  batch_hours: 1.0

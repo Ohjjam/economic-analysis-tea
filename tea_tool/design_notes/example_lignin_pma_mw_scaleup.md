@@ -1,0 +1,30 @@
+# Scale-up report — Lignin oxidation - microwave + PMA (auto first-cut)
+
+## Stage-by-stage TEA
+
+| Stage | ton/batch | CAPEX ($M) | Annualized CAPEX ($M/y) | OPEX ($M/y) | Revenue ($M/y) | Net profit ($M/y) | MSP ($/kg) | Annual product (t) | Batches/y | FTE |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Lab | 0.001 | 0.04 | 0.00 | 0.01 | 0.00 | -0.01 | 71.43 | 0.16 | 3504 | 0.5 |
+| Bench | 0.01 | 0.09 | 0.01 | 0.03 | 0.05 | 0.00 | 12.92 | 1.58 | 3504 | 1 |
+| Pilot | 0.1 | 0.32 | 0.04 | 0.20 | 0.47 | 0.23 | 0.30 | 15.77 | 3504 | 3 |
+| Demo | 1 | 1.20 | 0.14 | 1.64 | 4.73 | 2.94 | -3.66 | 157.68 | 3504 | 8 |
+| Commercial | 10 | 4.73 | 0.56 | 14.97 | 47.27 | 31.74 | -5.13 | 1576.80 | 3504 | 15 |
+
+## Generic scale-up risks (reaction class)
+- Electrode area scales linearly with current — capex of the cell stack dominates and does NOT follow the 6/10 rule.
+- Gas management: H2/O2 evolution rates scale linearly; explosion-proof venting and gas-liquid disengagement become mandatory above pilot.
+- Membrane lifetime (Nafion/PEM): expect 5-7 y replacement; build into OPEX as a periodic stream.
+- Current distribution uniformity is hard above ~1 m² electrode — split into multiple cells in series rather than one giant cell.
+- Electrolyte purification / makeup gets expensive at commercial scale; consider in-loop ion-exchange.
+
+## Downstream scale-up risks
+- Distillation: reflux ratio + tray count must be set from VLE data, not lab approximation; capex follows ~0.65 scaling.
+- Extraction: solvent recovery loop is essential — virgin solvent OPEX kills the economics if recovery < 95%.
+- Crystallisation: scale-up to >1 ton requires a defined cooling profile (PAT/seeding) to avoid agglomeration.
+- Membrane separation: flux declines with feed concentration; fouling cleaning cycle = OPEX line.
+
+## EHS / safety scale-up notes
+- Chloroform is a suspected carcinogen — closed handling, vapor recovery, and exposure monitoring required at >100 L.
+
+## Recommendation
+Largest profitable stage: **Commercial** (10 ton/batch), net profit $31.74 M/y, MSP $-5.13/kg. Scale up with stage gates at each ladder rung.

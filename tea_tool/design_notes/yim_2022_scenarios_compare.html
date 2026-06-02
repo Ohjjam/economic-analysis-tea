@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8" />
+<title>Scenario comparison</title>
+<style>
+  :root, html[data-theme="light"] { --bg:#fafafa; --fg:#111; --muted:#555;
+    --accent:#1565C0; --card:#fff; --border:#e0e0e0; }
+  html[data-theme="dark"] { --bg:#1a1a1a; --fg:#eee; --muted:#aaa;
+    --accent:#64B5F6; --card:#232323; --border:#333; }
+  @media (prefers-color-scheme: dark) {
+    html[data-theme="auto"] { --bg:#1a1a1a; --fg:#eee; --muted:#aaa;
+      --accent:#64B5F6; --card:#232323; --border:#333; }
+  }
+  body { background: var(--bg); color: var(--fg); margin: 0;
+          font: 14px/1.5 -apple-system, "Segoe UI", Roboto, Helvetica, Arial; }
+  .container { max-width: 1400px; margin: 0 auto; padding: 28px; }
+  h1 { margin: 0 0 18px 0; }
+  .card { background: var(--card); border: 1px solid var(--border);
+           border-radius: 8px; padding: 18px 22px; margin-bottom: 18px; }
+  h2 { margin-top: 0; font-size: 16px; color: var(--accent);
+        border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 8px 10px;
+            border-bottom: 1px solid var(--border); }
+  th { font-size: 12px; color: var(--muted); text-transform: uppercase;
+        letter-spacing: 0.04em; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .winner { color: #2E7D32; font-weight: 600; }
+  .loser  { color: #C62828; }
+  canvas { max-height: 320px; }
+  .theme-toggle { position: fixed; top: 14px; right: 16px;
+                   background: var(--card); color: var(--fg);
+                   border: 1px solid var(--border); border-radius: 6px;
+                   padding: 6px 12px; font-size: 13px; cursor: pointer; }
+</style>
+</head>
+<body>
+<button class="theme-toggle" onclick="toggleTheme()">🌓 theme</button>
+<div class="container">
+  <h1>Scenario comparison</h1>
+
+  <div class="card">
+    <h2>Summary</h2>
+    <table>
+      <tr><th>Scenario</th><th>MSP product</th><th class="num">Scale (t)</th>
+          <th class="num">CAPEX ($M)</th><th class="num">OPEX ($M/y)</th>
+          <th class="num">Revenue ($M/y)</th><th class="num">Net ($M/y)</th>
+          <th class="num">MSP ($/kg)</th><th>Detail</th></tr>
+      <tr><td>Original (vanillin MSP)</td><td>Vanillin</td><td class='num'>10</td><td class='num'>12.93</td><td class='num'>123.29</td><td class='num'>2.54</td><td class='num'>-122.27</td><td class='num '>$1821.48</td><td><a href='paper_yim_2022_modular_flow_lignin.html'>open</a></td></tr>
+      <tr><td>Option A (H2 MSP)</td><td>H2</td><td class='num'>10</td><td class='num'>12.93</td><td class='num'>123.29</td><td class='num'>4.25</td><td class='num'>-120.55</td><td class='num '>$413.21</td><td><a href='paper_yim_2022_A_h2_msp.html'>open</a></td></tr>
+      <tr><td>Option C (2-MeTHF)</td><td>H2</td><td class='num'>10</td><td class='num'>12.93</td><td class='num'>127.35</td><td class='num'>4.25</td><td class='num'>-124.61</td><td class='num '>$426.85</td><td><a href='paper_yim_2022_C_metHF.html'>open</a></td></tr>
+      <tr><td>Option D (paper-grade)</td><td>H2</td><td class='num'>100</td><td class='num'>117.70</td><td class='num'>271.15</td><td class='num'>527.28</td><td class='num'>242.31</td><td class='num winner'>$4.16</td><td><a href='yim_2022_papergrade.html'>open</a></td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>MSP across scenarios</h2>
+    <canvas id="cmp_msp"></canvas>
+  </div>
+
+  <div class="card">
+    <h2>CAPEX vs OPEX vs Revenue</h2>
+    <canvas id="cmp_stack"></canvas>
+  </div>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script>
+  function toggleTheme() {
+    const cur = document.documentElement.getAttribute("data-theme");
+    document.documentElement.setAttribute("data-theme",
+      cur === "dark" ? "light" : "dark");
+    localStorage.setItem("tea-theme",
+      document.documentElement.getAttribute("data-theme"));
+    location.reload();
+  }
+  const saved = localStorage.getItem("tea-theme");
+  if (saved) document.documentElement.setAttribute("data-theme", saved);
+
+  const DATA = [{"label": "Original (vanillin MSP)", "msp_product": "Vanillin", "scale_t": 10.0, "capex_total_m": 12.929793371912815, "capex_ann_m": 1.5199304614325386, "opex_m": 123.28880764797233, "rev_m": 2.5399867924528303, "net_m": -122.26875131695203, "msp": 1821.4807343286607, "html_path": "paper_yim_2022_modular_flow_lignin.html"}, {"label": "Option A (H2 MSP)", "msp_product": "H2", "scale_t": 10.0, "capex_total_m": 12.929793371912815, "capex_ann_m": 1.5199304614325386, "opex_m": 123.28880764797233, "rev_m": 4.254384905660377, "net_m": -120.55435320374448, "msp": 413.2118670597703, "html_path": "paper_yim_2022_A_h2_msp.html"}, {"label": "Option C (2-MeTHF)", "msp_product": "H2", "scale_t": 10.0, "capex_total_m": 12.929793371912815, "capex_ann_m": 1.5199304614325386, "opex_m": 127.34575447473048, "rev_m": 4.254384905660377, "net_m": -124.61130003050263, "msp": 426.84823069613395, "html_path": "paper_yim_2022_C_metHF.html"}, {"label": "Option D (paper-grade)", "msp_product": "H2", "scale_t": 100.0, "capex_total_m": 117.69999624212237, "capex_ann_m": 13.830019709548425, "opex_m": 271.1451127924577, "rev_m": 527.28192, "net_m": 242.3067874979939, "msp": 4.158251086092182, "html_path": "yim_2022_papergrade.html"}];
+  const txt = getComputedStyle(document.documentElement).getPropertyValue("--fg").trim();
+  const acc = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim();
+
+  new Chart(document.getElementById("cmp_msp"), {
+    type: "bar",
+    data: {
+      labels: DATA.map(s => s.label),
+      datasets: [{ label: "MSP ($/kg)",
+                    data: DATA.map(s => s.msp),
+                    backgroundColor: acc + "AA" }]
+    },
+    options: { scales: { y: { beginAtZero: true,
+                                ticks: { color: txt },
+                                title: { display: true, text: "MSP ($/kg)", color: txt } },
+                          x: { ticks: { color: txt } } },
+                 plugins: { legend: { display: false } } }
+  });
+
+  new Chart(document.getElementById("cmp_stack"), {
+    type: "bar",
+    data: {
+      labels: DATA.map(s => s.label),
+      datasets: [
+        { label: "Annualized CAPEX ($M/y)", data: DATA.map(s => s.capex_ann_m),
+           backgroundColor: "#37474F" },
+        { label: "OPEX ($M/y)", data: DATA.map(s => s.opex_m),
+           backgroundColor: "#90A4AE" },
+        { label: "Revenue ($M/y)", data: DATA.map(s => s.rev_m),
+           backgroundColor: "#43A047" }
+      ]
+    },
+    options: { scales: { y: { stacked: false, ticks: { color: txt } },
+                          x: { stacked: false, ticks: { color: txt } } } }
+  });
+</script>
+</body>
+</html>

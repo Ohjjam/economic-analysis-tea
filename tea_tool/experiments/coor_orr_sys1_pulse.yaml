@@ -1,0 +1,112 @@
+# System #1 — Paired COOR (anode) + 2e-ORR (cathode), 1.0 V / 0.0 V pulse.
+# Source: Article/260506 COOR-ORR TEA.xlsx, sheet "system 1".
+# Anode  : CO + 4OH-  -> CO3^2- + 2H2O + 2e-     (LDG gas as CO source)
+# Cathode: O2 + H2O + 2e- -> HO2- + OH-          (2-electron oxygen reduction)
+# Product: H2O2  +  K2CO3 (anolyte byproduct)
+meta:
+  name: "COOR-ORR paired electrolysis (1V pulse, LDG feed)"
+  slug: "coor_orr_sys1_pulse"
+  date: 2026-05-06
+  researcher: "TEA workbook"
+  lab: "UNIST"
+  notes: |
+    System #1 from the 260506 COOR-ORR TEA workbook. LDG (lignin
+    depolymerization gas, modelled as CO) is oxidized on the anode while
+    O2 is reduced to H2O2 on the cathode. The 1.0 V on / 0.0 V off pulse
+    keeps the catalyst at low overpotential and yields a duty cycle of
+    2.4 h / (2.4+0.6 h) = 80 %.
+
+chemistry:
+  reaction_type: "electrochemical"
+  description: |
+    Paired electrolysis: CO oxidation reaction (COOR) at anode produces
+    K2CO3 in 90 wt% KOH electrolyte; 2-electron ORR at the cathode
+    produces H2O2 (target product).
+  reactions:
+    - lhs: "CO + 4 OH-"
+      rhs: "CO3^2- + 2 H2O + 2 e-"
+      role: "anode"
+    - lhs: "O2 + H2O + 2 e-"
+      rhs: "HO2- + OH-"
+      role: "cathode"
+  target_products:
+    - "H2O2"
+    - "K2CO3"
+
+feedstock:
+  primary:
+    name: "LDG gas (CO surrogate)"
+    mass_per_batch_g: 3.27       # 70 mL/min * 1.145 g/L * 60 min/hr * 3 h / 1000 (assume 3 h batch)
+    price_usd_per_kg: 0.0
+    source_note: "LDG modelled as pure CO at $0 (waste-gas valorisation)"
+  reagents:
+    - name: "O2"
+      mass_per_batch_g: 64.3      # 500 mL/min * 1.429 g/L * 60 * 1.5 (effective on-time) / 1000
+      recovery_fraction: 0.99
+      role: "input"
+      price_usd_per_kg: 0.032
+    - name: "KOH"
+      mass_per_batch_g: 5.0       # 1 M, 50 mL anolyte + 50 mL catholyte ≈ 5.6 g; rounded
+      recovery_fraction: 0.99
+      role: "solvent"
+      price_usd_per_kg: 0.57
+    - name: "H2O"
+      mass_per_batch_g: 100.0     # 50 mL/hr anode + 50 mL/hr cathode (each side)
+      recovery_fraction: 0.99
+      role: "utility"
+      price_usd_per_kg: 0.00022
+
+operating_conditions:
+  temperature_C: 25
+  pressure_bar: 1
+  ph: 14
+  reaction_time_h: 3.0
+  batch_volume_ml: 100
+  electrochem:
+    cell_voltage_V: 1.0
+    current_density_mA_cm2: 95          # 105~85 average
+    faradaic_efficiency_pct: 73.1       # cathode FE for H2O2
+    electrode_area_cm2: 1.0
+    electrolyte: "1 M KOH (90 wt%)"
+    membrane: "Nafion 117"
+
+results:
+  yields:
+    - product: "H2O2"
+      yield_pct: 4.87             # 0.159 g per 3.27 g LDG feed
+      selectivity_pct: 73.1
+    - product: "K2CO3"
+      yield_pct: 23.0             # 0.751 g per 3.27 g LDG feed
+      selectivity_pct: 85.0
+  conversion_pct: 1.55             # mol of CO consumed / mol of CO fed
+  mass_balance_closure_pct: 95
+  notes: "LPS-driven K2CO3 separation (1.18 kg LPS / kg water)."
+
+downstream:
+  - step: "K2CO3 crystallization"
+    method: "Evaporative crystallization (LPS heated)"
+    solvent_loading_kg_per_kg_feed: 0.0
+    recovery_pct: 95.8
+    target_purity_pct: 98
+  - step: "H2O2 polishing"
+    method: "Distillation (cathode side)"
+    solvent_loading_kg_per_kg_feed: 0.0
+    recovery_pct: 90
+    target_purity_pct: 30          # 30 wt% commercial spec
+  - step: "Gas recycle (CO/O2)"
+    method: "PSA / membrane"
+    solvent_loading_kg_per_kg_feed: 0.0
+    recovery_pct: 99.0
+
+constraints:
+  preferred_msp_product: "H2O2"
+  hazardous_materials: ["h2", "naoh"]
+  scale_up_priority: "balanced"
+  plant_lifetime_years: 30
+  discount_rate: 0.07
+  must_have_unit_operations: ["membrane", "crystallization"]
+
+scale_targets:
+  scales_ton_per_batch: [0.001, 0.01, 0.1, 1.0, 10.0]
+  capacity_factor: 0.959           # 8400 / 8760
+  batch_hours: 3.0

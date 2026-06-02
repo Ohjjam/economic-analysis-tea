@@ -1,0 +1,96 @@
+# System #4 — COOR + 2e-ORR with pure CO (not LDG), 1V pulse.
+# Source: Article/260506 COOR-ORR TEA.xlsx, sheet "system 4".
+# Identical topology to System #1 but with priced CO feed ($5.68/kg).
+meta:
+  name: "COOR-ORR with pure CO feed (1V pulse)"
+  slug: "coor_orr_sys4_pureCO"
+  date: 2026-05-06
+  researcher: "TEA workbook"
+  lab: "UNIST"
+  notes: |
+    Same paired electrolysis as system #1 but the anode is fed with pure
+    CO from a chemical-supplier source (Echemi 2025 = $5.68/kg) instead
+    of free LDG. Lets the TEA isolate the effect of CO procurement cost.
+
+chemistry:
+  reaction_type: "electrochemical"
+  description: |
+    Identical chemistry to system 1; only the CO feedstock cost differs.
+  reactions:
+    - lhs: "CO + 4 OH-"
+      rhs: "CO3^2- + 2 H2O + 2 e-"
+      role: "anode"
+    - lhs: "O2 + H2O + 2 e-"
+      rhs: "HO2- + OH-"
+      role: "cathode"
+  target_products:
+    - "H2O2"
+    - "K2CO3"
+
+feedstock:
+  primary:
+    name: "CO"
+    mass_per_batch_g: 3.27
+    price_usd_per_kg: 5.68
+    source_note: "Echemi 2025 commercial CO"
+  reagents:
+    - name: "O2"
+      mass_per_batch_g: 64.3
+      recovery_fraction: 0.99
+      role: "input"
+      price_usd_per_kg: 0.032
+    - name: "KOH"
+      mass_per_batch_g: 5.0
+      recovery_fraction: 0.99
+      role: "solvent"
+      price_usd_per_kg: 0.57
+    - name: "H2O"
+      mass_per_batch_g: 100.0
+      recovery_fraction: 0.99
+      role: "utility"
+      price_usd_per_kg: 0.00022
+
+operating_conditions:
+  temperature_C: 25
+  pressure_bar: 1
+  ph: 14
+  reaction_time_h: 3.0
+  batch_volume_ml: 100
+  electrochem:
+    cell_voltage_V: 1.0
+    current_density_mA_cm2: 95
+    faradaic_efficiency_pct: 73.1
+    electrode_area_cm2: 1.0
+    electrolyte: "1 M KOH (90 wt%)"
+    membrane: "Nafion 117"
+
+results:
+  yields:
+    - product: "H2O2"
+      yield_pct: 4.87
+      selectivity_pct: 73.1
+    - product: "K2CO3"
+      yield_pct: 23.0
+      selectivity_pct: 85.0
+
+downstream:
+  - step: "K2CO3 crystallization"
+    method: "Evaporative crystallization"
+    recovery_pct: 95.2
+    target_purity_pct: 98
+  - step: "H2O2 polishing"
+    method: "Distillation"
+    recovery_pct: 90
+    target_purity_pct: 30
+
+constraints:
+  preferred_msp_product: "H2O2"
+  hazardous_materials: ["co"]
+  scale_up_priority: "balanced"
+  plant_lifetime_years: 30
+  discount_rate: 0.07
+
+scale_targets:
+  scales_ton_per_batch: [0.001, 0.01, 0.1, 1.0, 10.0]
+  capacity_factor: 0.959
+  batch_hours: 3.0

@@ -1,0 +1,100 @@
+# Paper: Techno-economic analysis of FDCA production through electrocatalytic processes.
+# HMF -> FDCA on Ni/NiOOH foam. Continuous oxidation + two-step pH-shift crystallization.
+meta:
+  name: "HMF -> FDCA (Ni/NiOOH foam, electrochemical)"
+  slug: "paper_hmf_to_fdca"
+  date: 2022-04-01
+  researcher: "Roylance, Choi et al. (TEA)"
+  lab: "(paper reproduction)"
+  notes: |
+    Bio-based PET alternative. HMF oxidised electrochemically on
+    non-noble Ni/NiOOH foam → FDCA. TEA-driven design: requires
+    j ≥ 120 mA/cm² and FE ≥ 80% for profitability. Reported MSP
+    €3.67/kg (~$4.00/kg) at 10 000 ton/y, 70% overall yield,
+    95% separation efficiency.
+
+chemistry:
+  reaction_type: "electrochemical"
+  description: |
+    Continuous HMF electrochemical oxidation in alkaline.
+    Anode: HMF + 6 OH- -> FDCA + 4 H2O + 6 e-.
+    Cathode: HER (6 H+ + 6 e- -> 3 H2).
+  reactions:
+    - lhs: "HMF + 6 OH-"
+      rhs: "FDCA + 4 H2O + 6 e-"
+      role: "anode"
+    - lhs: "6 H+ + 6 e-"
+      rhs: "3 H2"
+      role: "cathode"
+  target_products:
+    - "FDCA"
+    - "H2"
+
+feedstock:
+  primary:
+    name: "HMF"
+    mass_per_batch_g: 5.0
+    price_usd_per_kg: 2.50
+    source_note: "Bio-derived HMF (bulk)"
+  reagents:
+    - name: "KOH"
+      mass_per_batch_g: 8.4
+      recovery_fraction: 0.99
+      role: "solvent"
+      price_usd_per_kg: 0.57
+    - name: "H2O"
+      mass_per_batch_g: 150.0
+      recovery_fraction: 0.99
+      role: "utility"
+      price_usd_per_kg: 0.00022
+
+operating_conditions:
+  temperature_C: 50
+  pressure_bar: 1
+  ph: 13
+  reaction_time_h: 2.0
+  electrochem:
+    cell_voltage_V: 1.45
+    current_density_mA_cm2: 120
+    faradaic_efficiency_pct: 80
+    electrode_area_cm2: 1.0
+    electrolyte: "1.5 M KOH"
+    membrane: "AEM"
+
+results:
+  yields:
+    - product: "FDCA"
+      yield_pct: 90
+      selectivity_pct: 80
+    - product: "H2"
+      yield_pct: 1.0
+  conversion_pct: 95
+
+downstream:
+  - step: "FDCA pH-shift crystallization (step 1)"
+    method: "Acidification + crystallization"
+    recovery_pct: 95
+    target_purity_pct: 98
+  - step: "Re-dissolution + crystallization (step 2)"
+    method: "Crystallization"
+    recovery_pct: 95
+    target_purity_pct: 99.5
+  - step: "Filtration"
+    method: "Filter / Centrifuge"
+    recovery_pct: 99
+
+constraints:
+  preferred_msp_product: "FDCA"
+  hazardous_materials: ["koh", "h2"]
+  scale_up_priority: "balanced"
+  plant_lifetime_years: 20
+  discount_rate: 0.08
+
+scale_targets:
+  scales_ton_per_batch: [0.01, 0.1, 1.0, 5.0, 10.0]
+  capacity_factor: 0.92
+  batch_hours: 2.0
+
+reported:
+  msp_usd_per_kg: 4.00
+  source: "Roylance et al., TEA of FDCA electrocatalytic synthesis (10,000 t/y)"

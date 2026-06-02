@@ -1,0 +1,103 @@
+# Paper: Na, Seo, Brown et al., Nat Commun 10, 5193 (2019).
+# "General technoeconomic analysis for electrochemical coproduction
+#  coupling carbon dioxide reduction with organic oxidation"
+# Worked example: cathodic CO2 -> CO  +  anodic furfural -> 2-furoic acid.
+meta:
+  name: "Na 2019 — CO2RR-OOR (CO + 2-furoic acid)"
+  slug: "paper_na_2019_co2rr_oor"
+  date: 2019-11-15
+  researcher: "Na, Seo, Brown et al. (Nat Commun)"
+  lab: "GIST / KAIST (paper reproduction)"
+  notes: |
+    Paired PEM electrolyzer with CO2 → CO at the cathode and
+    furfural → 2-furoic acid at the anode. 90% electrolyte and organic
+    recycle. Reported LCC mean for 2-furoic acid co-product: $1.73/kg
+    (HER-OOR pairing), CO standalone: $14.18/kg (CO2RR-OER pairing).
+
+chemistry:
+  reaction_type: "electrochemical"
+  description: |
+    Single PEM cell. Cathode: CO2 + 2 H+ + 2 e- -> CO + H2O.
+    Anode: furfural + 2 OH- -> 2-furoic acid + H2O + 2 e-.
+    Both products sold; co-product credit drives economics.
+  reactions:
+    - lhs: "CO2 + 2 H+ + 2 e-"
+      rhs: "CO + H2O"
+      role: "cathode"
+    - lhs: "furfural + 2 OH-"
+      rhs: "2-furoic acid + H2O + 2 e-"
+      role: "anode"
+  target_products:
+    - "CO"
+    - "FuroicAcid"
+
+feedstock:
+  primary:
+    name: "CO2"
+    mass_per_batch_g: 1.57
+    price_usd_per_kg: 0.06
+    source_note: "Captured CO2 @ $0.06/kg (Na 2019)"
+  reagents:
+    - name: "Furfural"
+      mass_per_batch_g: 0.86
+      recovery_fraction: 0.90
+      role: "input"
+      price_usd_per_kg: 1.50
+    - name: "KHCO3"
+      mass_per_batch_g: 0.10
+      recovery_fraction: 0.90
+      role: "solvent"
+      price_usd_per_kg: 1.38
+    - name: "H2O"
+      mass_per_batch_g: 2.5
+      recovery_fraction: 0.0
+      role: "utility"
+      price_usd_per_kg: 0.00022
+
+operating_conditions:
+  temperature_C: 25
+  pressure_bar: 1
+  ph: 7
+  reaction_time_h: 1.0
+  electrochem:
+    cell_voltage_V: 2.4
+    current_density_mA_cm2: 200
+    faradaic_efficiency_pct: 85
+    electrode_area_cm2: 100
+    electrolyte: "0.1 M KHCO3"
+    membrane: "PEM (Nafion)"
+
+results:
+  yields:
+    - product: "CO"
+      yield_pct: 63.7
+      selectivity_pct: 85
+    - product: "FuroicAcid"
+      yield_pct: 116.3
+      selectivity_pct: 85
+
+downstream:
+  - step: "Cathode gas-liquid separation"
+    method: "Flash + PSA (zeolite LiX)"
+    recovery_pct: 99
+    target_purity_pct: 99
+  - step: "Anode product extraction"
+    method: "MTBE liquid-liquid extraction"
+    solvent_loading_kg_per_kg_feed: 3.5
+    recovery_pct: 95
+  - step: "Furoic acid distillation"
+    method: "Distillation"
+    recovery_pct: 95
+    target_purity_pct: 99
+
+constraints:
+  preferred_msp_product: "FuroicAcid"
+  hazardous_materials: ["co", "co2"]
+  scale_up_priority: "balanced"
+  plant_lifetime_years: 15
+  discount_rate: 0.10
+
+scale_targets:
+  scales_ton_per_batch: [0.01, 0.1, 1.0, 5.0, 10.0]
+  capacity_factor: 0.85
+  batch_hours: 1.0

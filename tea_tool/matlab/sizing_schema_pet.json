@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "tea_tool/matlab/sizing_schema_pet.json",
+  "title": "TEA physics sizing artifact for PET (data/matlab_sizing_pet.json)",
+  "description": "SINGLE SOURCE OF TRUTH for the PET JSON contract shared by matlab/run_sizing_pet.m and tea_engine/physics/run_sizing_pet.py, consumed by processes/pet_depolymerization.py. Bump schema_version on any breaking change and add it to _SCHEMA_SUPPORTED in the consumer.",
+  "type": "object",
+  "required": ["schema_version", "process", "electrolyzer", "reactor_heat"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["1.0"]},
+    "generated_at":   {"type": "string"},
+    "generated_by":   {"type": "string"},
+    "process":        {"type": "string"},
+    "design_point_ton_per_batch": {"type": "number", "exclusiveMinimum": 0},
+    "batch_hours":      {"type": "number", "exclusiveMinimum": 0},
+    "capacity_factor":  {"type": "number", "exclusiveMinimum": 0, "maximum": 1},
+    "batches_per_year": {"type": "number", "exclusiveMinimum": 0},
+
+    "electrolyzer": {
+      "type": "object",
+      "required": ["required_area_m2", "base_cost_usd",
+                   "specific_energy_kWh_per_kg_H2",
+                   "electricity_usd_per_t_feed_per_y"],
+      "properties": {
+        "h2_production_kg_per_batch":       {"type": "number", "minimum": 0},
+        "current_density_mA_cm2":           {"type": "number", "exclusiveMinimum": 0},
+        "cell_voltage_V":                   {"type": "number", "exclusiveMinimum": 0},
+        "faradaic_efficiency":              {"type": "number", "exclusiveMinimum": 0, "maximum": 1},
+        "electrons_per_h2":                 {"type": "number", "minimum": 1},
+        "required_current_A":               {"type": "number", "minimum": 0},
+        "required_area_m2":                 {"type": "number", "minimum": 0},
+        "area_cost_usd_per_m2":             {"type": "number", "minimum": 0},
+        "base_cost_usd":                    {"type": "number", "minimum": 0},
+        "specific_energy_kWh_per_kg_H2":    {"type": "number", "minimum": 0},
+        "electricity_price_usd_per_kWh":    {"type": "number", "minimum": 0},
+        "electricity_usd_per_t_feed_per_y": {"type": "number", "minimum": 0}
+      }
+    },
+
+    "reactor_heat": {
+      "type": "object",
+      "required": ["Q_net_GJ_per_batch", "heat_usd_per_t_feed_per_y"],
+      "properties": {
+        "T_feed_C":                  {"type": "number"},
+        "T_react_C":                 {"type": "number"},
+        "delta_T_K":                 {"type": "number"},
+        "sigma_mCp_kJ_per_K_per_t":  {"type": "number", "minimum": 0},
+        "heat_recovery_fraction":    {"type": "number", "minimum": 0, "maximum": 1},
+        "Q_heating_GJ_per_batch":    {"type": "number", "minimum": 0},
+        "Q_net_GJ_per_batch":        {"type": "number", "minimum": 0},
+        "steam_price_usd_per_GJ":    {"type": "number", "minimum": 0},
+        "heat_usd_per_t_feed_per_y": {"type": "number", "minimum": 0}
+      }
+    }
+  }
+}

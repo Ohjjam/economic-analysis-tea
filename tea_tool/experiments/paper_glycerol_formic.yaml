@@ -1,0 +1,98 @@
+# Paper: Electrooxidation of glycerol to formic acid (Cu²⁺-modified Au/Ni system).
+# Recent industrial-current-density TEA: 800 mA/cm² and 99.3% FE achievable.
+meta:
+  name: "Glycerol -> formic acid (industrial-level EO)"
+  slug: "paper_glycerol_formic"
+  date: 2024-09-01
+  researcher: "Li et al. (ChemSusChem review)"
+  lab: "(paper reproduction)"
+  notes: |
+    Biodiesel-derived crude glycerol electrochemically upgraded to
+    formic acid. Au-coated Ni foam (modified) achieves 99.3 % FE at
+    800 mA/cm² in the most recent reports. Formic acid market 2024:
+    ~$0.84-1.57/kg (premium grade).
+
+chemistry:
+  reaction_type: "electrochemical"
+  description: |
+    Anode: C3H8O3 + 6 OH- -> 3 HCOOH + 6 H+ + 8 e- (effectively).
+    Cathode: HER (H+ + e- -> 0.5 H2).
+  reactions:
+    - lhs: "C3H8O3 + 6 OH-"
+      rhs: "3 HCOOH + various intermediates + e-"
+      role: "anode"
+    - lhs: "H+ + e-"
+      rhs: "0.5 H2"
+      role: "cathode"
+  target_products:
+    - "FA"
+    - "H2"
+
+feedstock:
+  primary:
+    name: "Glycerol"
+    mass_per_batch_g: 5.0
+    price_usd_per_kg: 0.10
+    source_note: "Biodiesel-derived crude glycerol (waste stream)"
+  reagents:
+    - name: "KOH"
+      mass_per_batch_g: 5.6
+      recovery_fraction: 0.99
+      role: "solvent"
+      price_usd_per_kg: 0.57
+    - name: "H2O"
+      mass_per_batch_g: 100.0
+      recovery_fraction: 0.99
+      role: "utility"
+      price_usd_per_kg: 0.00022
+
+operating_conditions:
+  temperature_C: 30
+  pressure_bar: 1
+  ph: 13
+  reaction_time_h: 1.0
+  electrochem:
+    cell_voltage_V: 1.5
+    current_density_mA_cm2: 800
+    faradaic_efficiency_pct: 99.3
+    electrode_area_cm2: 1.0
+    electrolyte: "1 M KOH"
+    membrane: "AEM"
+
+results:
+  yields:
+    - product: "FA"
+      yield_pct: 110.0     # 3 mol FA / 1 mol glycerol on mass basis
+      selectivity_pct: 99
+    - product: "H2"
+      yield_pct: 5.0
+  conversion_pct: 90
+
+downstream:
+  - step: "Formate crystallization"
+    method: "Crystallization"
+    recovery_pct: 92
+    target_purity_pct: 95
+  - step: "Formic acid distillation"
+    method: "Distillation"
+    recovery_pct: 90
+    target_purity_pct: 99
+  - step: "H2 purification"
+    method: "PSA"
+    recovery_pct: 98
+
+constraints:
+  preferred_msp_product: "FA"
+  hazardous_materials: ["hcooh", "koh"]
+  scale_up_priority: "opex"
+  plant_lifetime_years: 20
+  discount_rate: 0.08
+
+scale_targets:
+  scales_ton_per_batch: [0.01, 0.1, 1.0, 5.0, 10.0]
+  capacity_factor: 0.92
+  batch_hours: 1.0
+
+reported:
+  msp_usd_per_kg: 0.85
+  source: "Glycerol electro-oxidation TEA (Nat Sustain / ChemSusChem 2024-2025)"

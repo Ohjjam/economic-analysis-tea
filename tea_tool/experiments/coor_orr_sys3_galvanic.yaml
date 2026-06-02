@@ -1,0 +1,97 @@
+# System #3 — Galvanic LDG-COOR + air-fed 2e-ORR (0 V, passive operation).
+# Source: Article/260506 COOR-ORR TEA.xlsx, sheet "system 3".
+meta:
+  name: "Galvanic COOR-ORR (0V, LDG + air)"
+  slug: "coor_orr_sys3_galvanic"
+  date: 2026-05-06
+  researcher: "TEA workbook"
+  lab: "UNIST"
+  notes: |
+    Passive (0 V external) operation. The CO oxidation reaction at the
+    anode supplies electrons for the cathodic 2e-ORR, producing H2O2
+    without an external power source. Lower current density and lower
+    Faradaic efficiency than the pulsed cases, but ZERO electricity cost.
+
+chemistry:
+  reaction_type: "electrochemical"
+  description: |
+    Spontaneous galvanic cell coupling COOR (LDG/CO oxidation in alkaline
+    media) with 2e-ORR (air-fed cathode). No external electricity is
+    drawn; the reaction proceeds at its thermodynamic potential.
+  reactions:
+    - lhs: "CO + 4 OH-"
+      rhs: "CO3^2- + 2 H2O + 2 e-"
+      role: "anode"
+    - lhs: "O2 + H2O + 2 e-"
+      rhs: "HO2- + OH-"
+      role: "cathode"
+  target_products:
+    - "H2O2"
+    - "K2CO3"
+
+feedstock:
+  primary:
+    name: "LDG gas (CO surrogate)"
+    mass_per_batch_g: 21.8      # 70 mL/min * 1.145 g/L * 60 min/hr * 20 hr * 0.13 (effective) / 1000
+    price_usd_per_kg: 0.0
+    source_note: "LDG as waste-gas; zero feedstock cost"
+  reagents:
+    - name: "Air"
+      mass_per_batch_g: 387      # ~21% O2 in air, 500 mL/min air * 60 * 20 / 1000 * 1.29 g/L
+      recovery_fraction: 0.99
+      role: "input"
+      price_usd_per_kg: 0.0
+    - name: "KOH"
+      mass_per_batch_g: 1.4
+      recovery_fraction: 0.99
+      role: "solvent"
+      price_usd_per_kg: 0.57
+    - name: "H2O"
+      mass_per_batch_g: 250.0
+      recovery_fraction: 0.99
+      role: "utility"
+      price_usd_per_kg: 0.00022
+
+operating_conditions:
+  temperature_C: 25
+  pressure_bar: 1
+  ph: 14
+  reaction_time_h: 20.0
+  batch_volume_ml: 25
+  electrochem:
+    cell_voltage_V: 0.0          # galvanic, no external power
+    current_density_mA_cm2: 7.5  # 536.6 C / (20 h * 3600 s) / 1 cm² ≈ 7.5
+    faradaic_efficiency_pct: 63.07
+    electrode_area_cm2: 1.0
+    electrolyte: "1 M KOH"
+    membrane: "Nafion 117 (12.57 cm²)"
+
+results:
+  yields:
+    - product: "H2O2"
+      yield_pct: 0.27             # 0.060 g per 21.8 g feed
+      selectivity_pct: 63.07
+    - product: "K2CO3"
+      yield_pct: 1.50
+
+downstream:
+  - step: "K2CO3 crystallization"
+    method: "Evaporative crystallization"
+    recovery_pct: 83
+    target_purity_pct: 95
+  - step: "H2O2 polishing"
+    method: "Distillation"
+    recovery_pct: 88
+    target_purity_pct: 30
+
+constraints:
+  preferred_msp_product: "H2O2"
+  hazardous_materials: []
+  scale_up_priority: "capex"
+  plant_lifetime_years: 30
+  discount_rate: 0.07
+
+scale_targets:
+  scales_ton_per_batch: [0.001, 0.01, 0.1, 1.0, 10.0]
+  capacity_factor: 0.959
+  batch_hours: 20.0

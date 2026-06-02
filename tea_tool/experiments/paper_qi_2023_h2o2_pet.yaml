@@ -1,0 +1,108 @@
+# Paper: Qi, Du, Yang, Jiang, Li, Ma, Qiu et al., Nature Communications 14, 6263 (2023).
+# "Energy-saving and product-oriented hydrogen peroxide electrosynthesis
+#  enabled by electrochemistry pairing and product engineering"
+# Ni-Mn bimetal + onion carbon catalysts; ORR + PET upcycling pairing.
+meta:
+  name: "Qi 2023 — H2O2 + PET upcycling (Ni-Mn)"
+  slug: "paper_qi_2023_h2o2_pet"
+  date: 2023-10-07
+  researcher: "Qi, Du, Yang, Qiu et al. (Nat Commun)"
+  lab: "Tianjin / Dalian (paper reproduction)"
+  notes: |
+    Industrial-relevant cell: ORR-to-H2O2 paired with anodic
+    PET upcycling (depolymerization-product formate). 0.927 V at
+    400 mA/cm² — the lowest reported energy cost for industrial-scale
+    H2O2 electrosynthesis. H2O2 downstream upgraded to sodium
+    perborate / dibenzoyl peroxide.
+
+chemistry:
+  reaction_type: "electrochemical"
+  description: |
+    Paired flow cell with onion carbon cathode (H2O2) and Ni-Mn
+    bimetal anode oxidising waste PET-derived EG to formate.
+  reactions:
+    - lhs: "O2 + H2O + 2 e-"
+      rhs: "HO2- + OH-"
+      role: "cathode"
+    - lhs: "EG (from PET)"
+      rhs: "formate + 4 H+ + 4 e-"
+      role: "anode"
+  target_products:
+    - "H2O2"
+    - "FA"
+
+feedstock:
+  primary:
+    name: "PET"
+    mass_per_batch_g: 5.0
+    price_usd_per_kg: 0.10
+    source_note: "Waste PET, recycling market"
+  reagents:
+    - name: "O2"
+      mass_per_batch_g: 25.0
+      recovery_fraction: 0.95
+      role: "input"
+      price_usd_per_kg: 0.032
+    - name: "KOH"
+      mass_per_batch_g: 5.0
+      recovery_fraction: 0.99
+      role: "solvent"
+      price_usd_per_kg: 0.57
+    - name: "H2O"
+      mass_per_batch_g: 100.0
+      recovery_fraction: 0.99
+      role: "utility"
+      price_usd_per_kg: 0.00022
+
+operating_conditions:
+  temperature_C: 25
+  pressure_bar: 1
+  ph: 13
+  reaction_time_h: 1.0
+  electrochem:
+    cell_voltage_V: 0.927
+    current_density_mA_cm2: 400
+    faradaic_efficiency_pct: 97.5      # H2O2 FE
+    electrode_area_cm2: 25.0
+    electrolyte: "1 M KOH"
+    membrane: "Anion-exchange"
+
+results:
+  yields:
+    - product: "H2O2"
+      yield_pct: 18.0
+      selectivity_pct: 97.5
+    - product: "FA"
+      yield_pct: 24.0
+      selectivity_pct: 93.0
+  conversion_pct: 65
+  notes: "Industrial 400 mA/cm² at 0.927 V — lowest cell voltage reported."
+
+downstream:
+  - step: "H2O2 polishing"
+    method: "Distillation"
+    recovery_pct: 92
+    target_purity_pct: 30
+  - step: "Formate recovery"
+    method: "Crystallization"
+    recovery_pct: 88
+    target_purity_pct: 95
+  - step: "Sodium perborate conversion"
+    method: "Crystallization"
+    recovery_pct: 90
+
+constraints:
+  preferred_msp_product: "H2O2"
+  hazardous_materials: ["h2o2", "koh"]
+  scale_up_priority: "opex"
+  plant_lifetime_years: 20
+  discount_rate: 0.08
+
+scale_targets:
+  scales_ton_per_batch: [0.001, 0.01, 0.1, 1.0, 10.0]
+  capacity_factor: 0.92
+  batch_hours: 1.0
+
+reported:
+  msp_usd_per_kg: 0.51
+  source: "Qi et al., Nat Commun 14, 6263 (2023); SI TEA"

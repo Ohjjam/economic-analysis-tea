@@ -1,0 +1,155 @@
+# Paper: Yim, Oh, Choi, Ahn, Park, Kim, Ryu, Kim,
+# Advanced Science 2022, 9, 2204170.  doi:10.1002/advs.202204170
+# "Modular Flow Reactors for Valorization of Kraft Lignin and
+#  Low-Voltage Hydrogen Production"
+#
+# Continuous modular flow process: kraft lignin -> PMA-mediated oxidation
+# -> aromatic monomers (vanillin, acetovanillone) + low-voltage H2.
+# Co-authored by the user (H. Oh).
+meta:
+  name: "Yim/Oh 2022 — Modular flow lignin -> aromatics + low-V H2"
+  slug: "paper_yim_2022_modular_flow_lignin"
+  date: 2022-09-01
+  researcher: "Yim, Oh, Choi, Ryu, Kim (Adv Sci)"
+  lab: "POSTECH + UNIST"
+  notes: |
+    Modular flow system: 3-stage FRP (12 mL total) + chloroform
+    extraction + density-based phase separator (DPT) + electrolyzer.
+    Reduces reaction time 12 h (batch) -> 32 min (flow).
+    Hydrogen produced at 20.5 mA/cm2 at 1.5 V with NO OER / NO O2 evolution
+    via real-time PMA(red) -> PMA(ox) regeneration. Stable for >25 h.
+
+chemistry:
+  reaction_type: "electrochemical"            # hybrid catalytic + EC, run as electrochem class
+  description: |
+    Two coupled half-cells:
+      (1) Lignin oxidation in 1 M H2SO4 with PMA3- catalyst →
+          aromatic monomers (vanillin, acetovanillone) + PMA5-
+      (2) PMA5- electrochemical reactivation at anode + HER at cathode →
+          PMA3- recycle + H2 (no OER, no O2)
+    Process advantages: no OER → no H2/O2 mixing safety issue;
+    paired biomass oxidation gives 2× current at half the voltage of
+    conventional water electrolysis.
+  reactions:
+    - lhs: "Lignin + PMA(ox, PMA3-)"
+      rhs: "aromatic monomers (vanillin, acetovanillone) + PMA(red, PMA5-)"
+      role: "depolymerization"
+    - lhs: "Lignin"
+      rhs: "Lignin_ox + 2 H+ + 2 e-"
+      role: "oxidation half"
+    - lhs: "PMA3- + 2 H+ + 2 e-"
+      rhs: "PMA5-"
+      role: "reduction half"
+    - lhs: "PMA5- (at anode)"
+      rhs: "PMA3- + 2 H+ + 2 e-"
+      role: "anode reactivation"
+    - lhs: "2 H+ + 2 e-"
+      rhs: "H2"
+      role: "cathode"
+  target_products:
+    - "Vanillin"
+    - "H2"
+    - "Acetovanillone"
+
+feedstock:
+  primary:
+    name: "Organosolv Lignin"
+    mass_per_batch_g: 1.10           # 12 mL × 0.092 g/mL ≈ 1.10 g per FRP pass
+    purity_pct: 95
+    price_usd_per_kg: 0.40
+    source_note: "Kraft lignin (industrial 2024 market)"
+  reagents:
+    - name: "PMA"
+      mass_per_batch_g: 11.0         # 0.5 M × 12 mL × MW 1825 / 1000
+      recovery_fraction: 0.99
+      role: "catalyst"
+      price_usd_per_kg: 0.01
+    - name: "H2SO4"
+      mass_per_batch_g: 1.18         # 1 M × 12 mL × MW 98 / 1000
+      recovery_fraction: 0.97
+      role: "solvent"
+      price_usd_per_kg: 0.037
+    - name: "H2O"
+      mass_per_batch_g: 12.0
+      recovery_fraction: 0.95
+      role: "utility"
+      price_usd_per_kg: 0.00022
+    - name: "Chloroform"
+      mass_per_batch_g: 6.0           # in-line extraction solvent
+      recovery_fraction: 0.95
+      role: "solvent"
+      price_usd_per_kg: 1.50
+
+operating_conditions:
+  temperature_C: 80
+  pressure_bar: 35                    # up to 500 psi tolerance, run moderate
+  ph: 0.5
+  reaction_time_h: 0.53               # 32 min residence in FRP
+  batch_volume_ml: 12
+  electrochem:
+    cell_voltage_V: 1.5
+    current_density_mA_cm2: 20.5
+    faradaic_efficiency_pct: 100      # paper reports 100% reactivation @ 1.5V
+    electrode_area_cm2: 1.0
+    electrolyte: "1 M H2SO4 + PMA"
+    membrane: "Nafion / PEM"
+  thermal:
+    heating_method: "heat exchanger (integrated)"
+
+results:
+  yields:
+    - product: "Vanillin"
+      yield_pct: 0.0455            # 0.5 mg/h / 1.10 g feed (over 0.53 h)
+      selectivity_pct: 65
+    - product: "Acetovanillone"
+      yield_pct: 0.0155            # 0.17 mg/h / 1.10 g feed
+      selectivity_pct: 22
+    - product: "H2"
+      yield_pct: 0.07
+  conversion_pct: 20
+  mass_balance_closure_pct: 85
+  energy_consumption_kWh_per_kg_product: 24    # ~half of conventional 50 kWh/kg H2
+  notes: "Vanillin productivity 0.5 mg/h, acetovanillone 0.17 mg/h."
+
+downstream:
+  - step: "Chloroform extraction"
+    method: "In-line liquid-liquid extraction"
+    solvent: "Chloroform"
+    solvent_loading_kg_per_kg_feed: 5.0
+    recovery_pct: 90
+  - step: "Density-based phase separation"
+    method: "Density Phase Separation Tank (DPT)"
+    recovery_pct: 95
+  - step: "Chloroform recovery"
+    method: "Distillation"
+    recovery_pct: 95
+  - step: "Vanillin crystallisation"
+    method: "Cooling crystallization"
+    recovery_pct: 80
+    target_purity_pct: 98
+  - step: "Electrolyzer (PMA reactivation + HER)"
+    method: "Flow electrolyzer (Nafion-based PEM)"
+    recovery_pct: 100
+
+constraints:
+  preferred_msp_product: "Vanillin"
+  hazardous_materials: ["chloroform", "h2so4", "h2"]
+  scale_up_priority: "balanced"
+  plant_lifetime_years: 20
+  discount_rate: 0.10
+  must_have_unit_operations: ["extraction", "phase_separation", "electrolysis"]
+
+scale_targets:
+  scales_ton_per_batch: [0.001, 0.01, 0.1, 1.0, 10.0]
+  capacity_factor: 0.90
+  batch_hours: 0.53
+
+reported:
+  msp_usd_per_kg: null              # paper is proof-of-concept; no MSP reported
+  source: "Yim, Oh, Choi, Ryu, Kim, Adv Sci 9, 2204170 (2022)"
+  highlights:
+    - "Reaction time 12 h batch -> 32 min flow"
+    - "H2 at 20.5 mA/cm² at 1.5 V (low voltage, no O2 evolution)"
+    - "Vanillin 0.5 mg/h, acetovanillone 0.17 mg/h"
+    - "PMA reactivation 100 % at 1.5 V"
+    - "25 h stable continuous operation"

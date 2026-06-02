@@ -1,0 +1,95 @@
+# Paper: Bagemihl et al., ACS Sust. Chem. Eng. 2023.
+# "Techno-economic Assessment of CO2 Electrolysis: How Interdependencies
+#  between Model Variables Propagate across Different Modeling Scales"
+meta:
+  name: "Bagemihl 2023 — CO2 -> Ethylene (Cu-GDE)"
+  slug: "paper_bagemihl_2023_ethylene"
+  date: 2023-04-12
+  researcher: "Bagemihl et al. (ACS SCE)"
+  lab: "TU Delft (paper reproduction)"
+  notes: |
+    Cu gas-diffusion-electrode alkaline electrolyzer producing ethylene
+    from DAC CO2. Reported NPV negative at $1.30/kg C2H4 even with
+    optimised parameters (FE 0.85, j 100 mA/cm2, V 3.69 V).
+    Plant scale 10 000 kg-C2H4/d (~3500 t/y).
+
+chemistry:
+  reaction_type: "electrochemical"
+  description: |
+    Alkaline GDE electrolyzer. Cathode: 2 CO2 + 12 H+ + 12 e- ->
+    C2H4 + 4 H2O. Anode: 2 H2O -> O2 + 4 H+ + 4 e- (OER).
+  reactions:
+    - lhs: "2 CO2 + 12 H+ + 12 e-"
+      rhs: "C2H4 + 4 H2O"
+      role: "cathode"
+    - lhs: "2 H2O"
+      rhs: "O2 + 4 H+ + 4 e-"
+      role: "anode"
+  target_products:
+    - "C2H4"
+    - "O2"
+
+feedstock:
+  primary:
+    name: "CO2"
+    mass_per_batch_g: 1.84
+    price_usd_per_kg: 0.04
+    source_note: "DAC CO2 @ $0.04/kg"
+  reagents:
+    - name: "KHCO3"
+      mass_per_batch_g: 0.10
+      recovery_fraction: 0.0
+      role: "solvent"
+      price_usd_per_kg: 0.55
+    - name: "H2O"
+      mass_per_batch_g: 0.50
+      recovery_fraction: 0.0
+      role: "utility"
+      price_usd_per_kg: 0.00022
+    - name: "MEA membrane"
+      mass_per_batch_g: 0.0
+      recovery_fraction: 0.0
+      role: "catalyst"
+      price_usd_per_kg: 4000.0
+
+operating_conditions:
+  temperature_C: 25
+  pressure_bar: 5
+  ph: 8
+  reaction_time_h: 1.0
+  electrochem:
+    cell_voltage_V: 3.69
+    current_density_mA_cm2: 100
+    faradaic_efficiency_pct: 85
+    electrode_area_cm2: 100
+    electrolyte: "1 M KHCO3"
+    membrane: "MEA (Sustainion)"
+
+results:
+  yields:
+    - product: "C2H4"
+      yield_pct: 54.3
+      selectivity_pct: 85
+    - product: "O2"
+      yield_pct: 62.0
+
+downstream:
+  - step: "Pressure swing adsorption"
+    method: "PSA (CO2 / C2H4 / H2)"
+    recovery_pct: 97
+    target_purity_pct: 99.5
+  - step: "Anode O2 venting"
+    method: "Gas-Liquid Sep"
+    recovery_pct: 99
+
+constraints:
+  preferred_msp_product: "C2H4"
+  hazardous_materials: ["co2", "c2h4"]
+  scale_up_priority: "capex"
+  plant_lifetime_years: 20
+  discount_rate: 0.10
+
+scale_targets:
+  scales_ton_per_batch: [0.01, 0.1, 1.0, 5.0, 10.0]
+  capacity_factor: 0.96
+  batch_hours: 1.0

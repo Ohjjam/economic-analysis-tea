@@ -1,0 +1,40 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Product-strategy scenarios — Oh 2026 — Mild PET hydrolysis (PMA + EC)</title>
+<style>
+ :root{--bg:#fafafa;--fg:#141414;--muted:#666;--accent:#1565C0;--card:#fff;--border:#e3e3e3;}
+ @media(prefers-color-scheme:dark){:root{--bg:#161616;--fg:#ececec;--muted:#9a9a9a;--accent:#64B5F6;--card:#212121;--border:#333;}}
+ body{background:var(--bg);color:var(--fg);margin:0;font:15px/1.55 -apple-system,"Segoe UI",Roboto,Arial;}
+ .wrap{max-width:1100px;margin:0 auto;padding:30px 22px 60px;}
+ h1{margin:0 0 4px;font-size:23px;} .sub{color:var(--muted);margin:0 0 22px;}
+ a.back{color:var(--accent);text-decoration:none;}
+ .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:18px;}
+ h2{font-size:16px;color:var(--accent);border-bottom:1px solid var(--border);padding-bottom:6px;margin-top:0;}
+ table{width:100%;border-collapse:collapse;} th,td{text-align:left;padding:9px 11px;border-bottom:1px solid var(--border);}
+ th{font-size:12px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);}
+ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;}
+ tr.winner{background:rgba(46,125,50,.12);} .small{font-size:12px;} .muted{color:var(--muted);}
+ .flag{background:rgba(230,81,0,.12);border-left:3px solid #e65100;padding:10px 14px;border-radius:6px;margin-top:10px;}
+ ol,ul{margin:6px 0;}
+</style></head><body><div class="wrap">
+<p><a class="back" href="paper_oh_2026_pet_pma.html">← back to dossier</a></p>
+<h1>Product-strategy scenarios</h1>
+<p class="sub">Oh 2026 — Mild PET hydrolysis (PMA + EC) — recover &amp; sell each co-product, or not?
+Trade-off = extra product revenue vs. extra separation cost. Basis: 10 t feed/batch.</p>
+
+<div class="card"><h2>Scenario comparison (cumulative recovery)</h2>
+<table><tr><th>Scenario</th><th class="num">Revenue</th><th class="num">Ann. CAPEX</th>
+<th class="num">OPEX</th><th class="num">Net profit</th><th class="num">MSP of TPA</th></tr>
+<tr class='winner'><td><b>TPA</b></td><td class='num'>$43.37 M</td><td class='num'>$16.21 M</td><td class='num'>$18.48 M</td><td class='num'><b>$8.68 M</b></td><td class='num'>$0.65/kg</td></tr><tr class=''><td><b>TPA + EG</b></td><td class='num'>$47.58 M</td><td class='num'>$16.30 M</td><td class='num'>$26.35 M</td><td class='num'><b>$4.93 M</b></td><td class='num'>$0.78/kg</td></tr><tr class=''><td><b>TPA + EG + GA</b></td><td class='num'>$53.89 M</td><td class='num'>$16.36 M</td><td class='num'>$32.15 M</td><td class='num'><b>$5.37 M</b></td><td class='num'>$0.76/kg</td></tr><tr class=''><td><b>TPA + EG + GA + FA</b></td><td class='num'>$56.24 M</td><td class='num'>$16.39 M</td><td class='num'>$34.57 M</td><td class='num'><b>$5.28 M</b></td><td class='num'>$0.77/kg</td></tr></table>
+<p class="small muted">Highlighted = highest net profit. MSP of TPA credits all co-product revenue.</p></div>
+
+<div class="card"><h2>Per-co-product marginal economics — "is it worth recovering?"</h2>
+<table><tr><th>Co-product</th><th class="num">Amount</th><th class="num">Price</th>
+<th class="num">Revenue</th><th class="num">Separation cost</th><th class="num">Net gain</th><th>Feasibility</th></tr>
+<tr><td>Ethylene glycol</td><td class='num'>7,008 t/y</td><td class='num'>$0.6 <sup style='color:#1565C0'>[5]</sup></td><td class='num'>$4.20 M</td><td class='num'>$7.95 M <sup style='color:#1565C0'>[9]</sup></td><td class='num' style='color:#c62828'><b>$-3.75 M</b></td><td class='small'>Feasible but energy-heavy: EG bp 197 C, fully water-miscible -&gt; high reboiler duty.</td></tr><tr><td>Glycolic acid</td><td class='num'>4,205 t/y</td><td class='num'>$1.5 <sup style='color:#1565C0'>[5]</sup></td><td class='num'>$6.31 M</td><td class='num'>$5.87 M <sup style='color:#1565C0'>[9]</sup></td><td class='num' style='color:#2e7d32'><b>$+0.44 M</b></td><td class='small'>Hard: GA decomposes near bp -&gt; recovered by evaporation/crystallisation; costed as a distillation proxy x1.6.</td></tr><tr><td>Formic acid</td><td class='num'>2,803 t/y</td><td class='num'>$0.84 <sup style='color:#1565C0'>[1]</sup></td><td class='num'>$2.35 M</td><td class='num'>$2.45 M <sup style='color:#1565C0'>[9]</sup></td><td class='num' style='color:#c62828'><b>$-0.09 M</b></td><td class='small'>Feasible: FA bp 100.8 C but forms a water azeotrope (~78 wt%); IECR-2021 route handles it.</td></tr></table>
+<p class="small muted">Net gain = revenue − (annualised separation CAPEX + OPEX). Green = worth recovering; red = costs more than the sale.</p></div>
+
+<div class="card"><h2>References</h2><ol><li>[1] Oh, Lee, Lee et al., Green Chem. 2026, 28, 3573 (this paper) · <a href='https://doi.org/10.1039/d5gc04677g' target='_blank'>doi</a></li><li>[2] Post-consumer / waste PET recycling market price, 2024</li><li>[3] ICIS Chemical Business — PET contract price, 2024</li><li>[4] Made-in-China.com industrial bulk quotes (PMA, H2SO4), 2024</li><li>[5] Echemi market price — DMSO, 2024</li><li>[6] Na, Seh et al., Nat. Commun. 12, 4679 (2021) · <a href='https://doi.org/10.1038/s41467-021-25214-1' target='_blank'>doi</a></li><li>[7] KEPCO industrial electricity tariff, 2024</li><li>[8] Turton et al., Analysis, Synthesis &amp; Design of Chemical Processes, 5th ed. (2018)</li><li>[9] Ind. Eng. Chem. Res. 2021, 60, 5588–5599</li><li>[10] Joule 5, 2479–2503 (2021)</li></ol>
+<div class="flag"><b>⚠ Amounts to confirm against the paper's measured stream table:</b>
+<ul style="margin:6px 0 0"><li><b>Ethylene glycol</b>: [stoich/est] ~0.20 g/g PET (PET-&gt;TPA+EG, partial EG before oxidation)</li><li><b>Glycolic acid</b>: [paper yield] 12% w/w on PET</li><li><b>Formic acid</b>: [paper yield] 8% w/w on PET (validated build_pet output)</li></ul></div></div>
+</div></body></html>

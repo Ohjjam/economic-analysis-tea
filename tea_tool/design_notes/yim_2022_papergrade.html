@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>PFD — Modular Flow Lignin Valorisation + Low-V H2 (Yim 2022 paper-grade)</title>
+<style>
+  :root, html[data-theme="light"] {
+    --bg: #fafafa; --fg: #111; --muted: #555; --accent: #1565C0;
+    --card: #fff; --border: #e0e0e0;
+  }
+  html[data-theme="dark"] {
+    --bg: #1a1a1a; --fg: #eee; --muted: #aaa; --accent: #64B5F6;
+    --card: #232323; --border: #333;
+  }
+  @media (prefers-color-scheme: dark) {
+    html[data-theme="auto"] {
+      --bg: #1a1a1a; --fg: #eee; --muted: #aaa; --accent: #64B5F6;
+      --card: #232323; --border: #333;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--fg); margin: 0;
+          font: 14px/1.5 -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  header { padding: 20px 28px; border-bottom: 1px solid var(--border);
+            background: var(--card); }
+  h1 { margin: 0; font-size: 20px; font-weight: 600; }
+  h1 .small { color: var(--muted); font-weight: 400; font-size: 14px; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 24px 28px; }
+  .card { background: var(--card); border: 1px solid var(--border);
+           border-radius: 8px; padding: 18px 22px; margin-bottom: 18px; }
+  h2 { margin-top: 0; font-size: 16px; color: var(--accent);
+        border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+  .kv { display: grid; grid-template-columns: 200px 1fr; gap: 6px 18px; }
+  .kv dt { color: var(--muted); }
+  .kv dd { margin: 0; font-weight: 500; }
+  table { width: 100%; border-collapse: collapse; margin: 6px 0; }
+  th, td { text-align: left; padding: 6px 10px;
+            border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 500; font-size: 12px;
+        text-transform: uppercase; letter-spacing: 0.04em; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .pfd { background: var(--card); border-radius: 8px;
+          border: 1px solid var(--border); padding: 14px;
+          overflow-x: auto; }
+  details.risks { margin-top: 8px; }
+  details.risks summary { cursor: pointer; color: var(--accent);
+                           font-weight: 500; padding: 4px 0; }
+  details.risks ul { margin: 6px 0; padding-left: 24px; }
+  footer { color: var(--muted); font-size: 12px;
+            padding: 18px 28px; text-align: center; }
+  .badge { display: inline-block; padding: 2px 8px;
+            background: var(--accent); color: white; border-radius: 4px;
+            font-size: 11px; margin-left: 6px; }
+  .theme-toggle { position: fixed; top: 14px; right: 16px;
+                   background: var(--card); color: var(--fg);
+                   border: 1px solid var(--border); border-radius: 6px;
+                   padding: 6px 12px; font-size: 13px; cursor: pointer;
+                   z-index: 100; }
+  .theme-toggle:hover { background: var(--accent); color: white; }
+  .chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+                 gap: 16px; }
+  .chart-box { background: var(--card); border: 1px solid var(--border);
+                border-radius: 6px; padding: 10px 14px; }
+  .chart-box h3 { margin: 0 0 8px 0; font-size: 13px; color: var(--muted);
+                   font-weight: 500; }
+  canvas { max-height: 220px; }
+</style>
+</head>
+<body>
+<button class="theme-toggle" onclick="toggleTheme()">🌓 theme</button>
+<header>
+  <h1>Modular Flow Lignin Valorisation + Low-V H2 (Yim 2022 paper-grade) <span class="small">— Yim, Oh et al. (Adv Sci 2022)</span></h1>
+</header>
+<div class="container">
+
+  <div class="card">
+    <h2>📐 Process Flow Diagram</h2>
+    <div class="pfd">
+      <pre class="mermaid">
+flowchart LR
+    in_Organosolv_Lignin(["Organosolv Lignin<br/>12.5 g"])
+    in_PMA(["PMA<br/>5 g"])
+    in_H2SO4(["H2SO4<br/>0.5 g"])
+    in_H2O(["H2O<br/>12 g"])
+    in_2_MeTHF(["2-MeTHF<br/>4 g"])
+    in_Nafion_117(["Nafion 117<br/>0 g"])
+    sec_feedprep["Feedstock Pretreatment"]
+    sec_frp["Flow Reaction Platform (FRP × 3)"]
+    sec_ext["In-line LL Extraction"]
+    sec_dpt["Density Phase Separator"]
+    sec_solvrec["Solvent Recovery"]
+    sec_cryst["Vanillin Crystallisation"]
+    sec_ec["Flow Electrolyzer (PMA + HER)"]
+    sec_bop["Balance of Plant"]
+    out_H2(["H2<br/>1 g"])
+    out_Vanillin(["Vanillin<br/>0.024 g"])
+    out_Acetovanillone(["Acetovanillone<br/>0.008 g"])
+    in_Organosolv_Lignin -->|lignin slurry| sec_feedprep
+    in_H2SO4 -->|acid| sec_feedprep
+    in_PMA -->|PMA(ox)| sec_feedprep
+    sec_feedprep -->|anolyte feed| sec_frp
+    sec_frp -->|PMA(red) + aromatics| sec_ext
+    in_2_MeTHF -->|extraction solvent| sec_ext
+    sec_ext -->|two-phase mixture| sec_dpt
+    sec_dpt -->|organic phase| sec_solvrec
+    sec_dpt -->|PMA(red) aqueous| sec_ec
+    sec_solvrec -->|concentrated aromatic| sec_cryst
+    sec_solvrec -.->|recycled 2-MeTHF| sec_ext
+    sec_cryst --> out_Vanillin
+    sec_cryst --> out_Acetovanillone
+    in_H2O -->|anolyte makeup| sec_ec
+    in_Nafion_117 -->|membrane| sec_ec
+    sec_ec -->|cathode product| out_H2
+    sec_ec -.->|PMA(ox) recycle| sec_feedprep
+    sec_ec --> sec_bop
+    classDef feed       fill:#FFE0B2,stroke:#E65100;
+    classDef prod       fill:#C8E6C9,stroke:#2E7D32;
+    classDef rxn        fill:#E1BEE7,stroke:#6A1B9A;
+    classDef catalyst   fill:#F8BBD0,stroke:#AD1457;
+    classDef solvent    fill:#B2DFDB,stroke:#00695C;
+    classDef acidbase   fill:#FFCDD2,stroke:#C62828;
+    classDef utility    fill:#CFD8DC,stroke:#455A64;
+    classDef consumable fill:#D1C4E9,stroke:#4527A0;
+    class in_PMA catalyst;
+    class in_H2O utility;
+    class in_Organosolv_Lignin feed;
+    class in_H2SO4 acidbase;
+    class in_Nafion_117 consumable;
+    class in_2_MeTHF solvent;
+    class out_H2,out_Vanillin,out_Acetovanillone prod;
+    class sec_feedprep,sec_frp,sec_ext,sec_dpt,sec_solvrec,sec_cryst,sec_ec,sec_bop rxn;
+      </pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>📊 Topline TEA <span class="badge">at 100 t/batch</span></h2>
+    <dl class="kv">
+      <dt>CAPEX total</dt><dd>$117.70 M</dd>
+      <dt>CAPEX annualized</dt><dd>$13.83 M/y</dd>
+      <dt>OPEX</dt><dd>$271.15 M/y</dd>
+      <dt>Revenue total</dt><dd>$527.28 M/y</dd>
+      <dt>Net profit</dt><dd>$242.31 M/y</dd>
+      <dt>MSP (H2)</dt><dd>$4.16 /kg</dd>
+    </dl>
+  </div>
+
+  <div class='card'><h2>💰 Revenue breakdown @ 100 t/batch</h2><table><tr><th>Product</th><th class='num'>$M/y</th></tr><tr><td>H2</td><td class='num'>$504.58</td></tr><tr><td>Vanillin</td><td class='num'>$7.57</td></tr><tr><td>Acetovanillone</td><td class='num'>$15.14</td></tr></table></div>
+
+  <div class="card">
+    <h2>📈 Scale-up ladder</h2>
+    <table>
+      <tr><th>Stage</th><th class="num">t/batch</th>
+          <th class="num">CAPEX ($M)</th><th class="num">OPEX ($M/y)</th>
+          <th class="num">Revenue ($M/y)</th><th class="num">Net ($M/y)</th>
+          <th class="num">MSP ($/kg)</th></tr>
+      <tr><td>Lab</td><td class='num'>0.001</td><td class='num'>0.54</td><td class='num'>0.05</td><td class='num'>0.01</td><td class='num'>-0.11</td><td class='num'>187.77</td></tr><tr><td>Bench</td><td class='num'>0.01</td><td class='num'>0.88</td><td class='num'>0.11</td><td class='num'>0.05</td><td class='num'>-0.16</td><td class='num'>33.67</td></tr><tr><td>Pilot</td><td class='num'>0.1</td><td class='num'>2.28</td><td class='num'>0.47</td><td class='num'>0.53</td><td class='num'>-0.21</td><td class='num'>11.34</td></tr><tr><td>Demo</td><td class='num'>1</td><td class='num'>7.82</td><td class='num'>3.31</td><td class='num'>5.27</td><td class='num'>1.04</td><td class='num'>6.35</td></tr><tr><td>Commercial</td><td class='num'>10</td><td class='num'>29.88</td><td class='num'>28.74</td><td class='num'>52.73</td><td class='num'>20.47</td><td class='num'>4.75</td></tr>
+    </table>
+    <p><b>Recommendation:</b> At an MSP target of **$5.00/kg**, the process first becomes viable at the **Commercial** stage (10 ton/batch, MSP = $4.75/kg). Earlier stages are validation-only; CAPEX commitment should be staged with go/no-go gates after each.</p>
+  </div>
+
+  <div class='card'><h2>📉 Sensitivity sweeps</h2><div class='chart-grid'><div class='chart-box'><h3>Lignin price ($/kg)</h3><canvas id='chart_Lignin_price____kg_'></canvas></div><div class='chart-box'><h3>Vanillin sell price ($/kg)</h3><canvas id='chart_Vanillin_sell_price____kg_'></canvas></div><div class='chart-box'><h3>2-MeTHF recovery</h3><canvas id='chart_2_MeTHF_recovery'></canvas></div></div></div>
+
+  <div class='card'><h2>⚠️ Scale-up risks</h2><details class='risks' open><summary>Generic (5)</summary><ul><li>Electrode area scales linearly with current — capex of the cell stack dominates and does NOT follow the 6/10 rule.</li><li>Gas management: H2/O2 evolution rates scale linearly; explosion-proof venting and gas-liquid disengagement become mandatory above pilot.</li><li>Membrane lifetime (Nafion/PEM): expect 5-7 y replacement; build into OPEX as a periodic stream.</li><li>Current distribution uniformity is hard above ~1 m² electrode — split into multiple cells in series rather than one giant cell.</li><li>Electrolyte purification / makeup gets expensive at commercial scale; consider in-loop ion-exchange.</li></ul></details><details class='risks'><summary>Downstream (4)</summary><ul><li>Distillation: reflux ratio + tray count must be set from VLE data, not lab approximation; capex follows ~0.65 scaling.</li><li>Extraction: solvent recovery loop is essential — virgin solvent OPEX kills the economics if recovery &lt; 95%.</li><li>Crystallisation: scale-up to &gt;1 ton requires a defined cooling profile (PAT/seeding) to avoid agglomeration.</li><li>Membrane separation: flux declines with feed concentration; fouling cleaning cycle = OPEX line.</li></ul></details><details class='risks'><summary>EHS / safety (2)</summary><ul><li>Sulfuric acid: pH &lt; 1 streams need Hastelloy/PTFE wetted parts; spill containment per OSHA HCS.</li><li>H2 is highly flammable, LEL 4 vol-%; ventilation + leak monitoring + ATEX.</li></ul></details></div>
+
+  <div class="card">
+    <h2>🧪 Inputs / outputs (per batch)</h2>
+    <table>
+      <tr><th>Stream</th><th>Role</th><th class="num">g/batch</th>
+          <th class="num">Recovery</th></tr>
+      <tr><td>Organosolv Lignin</td><td>input</td><td class='num'>12.5</td><td class='num'>0.00</td></tr><tr><td>PMA</td><td>input</td><td class='num'>5</td><td class='num'>0.99</td></tr><tr><td>H2SO4</td><td>input</td><td class='num'>0.5</td><td class='num'>0.97</td></tr><tr><td>H2O</td><td>input</td><td class='num'>12</td><td class='num'>0.95</td></tr><tr><td>2-MeTHF</td><td>input</td><td class='num'>4</td><td class='num'>0.99</td></tr><tr><td>Nafion 117</td><td>input</td><td class='num'>0</td><td class='num'>0.00</td></tr><tr><td>H2</td><td>output</td><td class='num'>1</td><td class='num'>—</td></tr><tr><td>Vanillin</td><td>output</td><td class='num'>0.024</td><td class='num'>—</td></tr><tr><td>Acetovanillone</td><td>output</td><td class='num'>0.008</td><td class='num'>—</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>🛠️ Equipment</h2>
+    <table>
+      <tr><th>Section</th><th>Equipment</th><th class="num">Base cost ($)</th>
+          <th>Lifetime</th></tr>
+      <tr><td>Flow Electrolyzer (PMA + HER)</td><td>Cell housing</td><td class='num'>$10,000</td><td>30 y</td></tr><tr><td>Flow Electrolyzer (PMA + HER)</td><td>Electrodes (Pt-free)</td><td class='num'>$964</td><td>5 y</td></tr><tr><td>Flow Electrolyzer (PMA + HER)</td><td>Nafion 117 membrane</td><td class='num'>$180</td><td>5 y</td></tr><tr><td>Feedstock Pretreatment</td><td>Lignin dissolution tank</td><td class='num'>$240,000</td><td>permanent</td></tr><tr><td>Feedstock Pretreatment</td><td>PMA mixing / dosing</td><td class='num'>$180,000</td><td>permanent</td></tr><tr><td>Flow Reaction Platform (FRP × 3)</td><td>FRP plates + heat exchanger</td><td class='num'>$1,950,000</td><td>permanent</td></tr><tr><td>In-line LL Extraction</td><td>Static mixer + extractor</td><td class='num'>$320,000</td><td>permanent</td></tr><tr><td>Density Phase Separator</td><td>DPT vessels</td><td class='num'>$180,000</td><td>permanent</td></tr><tr><td>Solvent Recovery</td><td>Distillation column + reb</td><td class='num'>$1,350,000</td><td>permanent</td></tr><tr><td>Vanillin Crystallisation</td><td>Crystallizer + centrifuge</td><td class='num'>$720,000</td><td>permanent</td></tr><tr><td>Balance of Plant</td><td>Pumps, HX, control</td><td class='num'>$980,000</td><td>permanent</td></tr>
+    </table>
+  </div>
+
+</div>
+
+<footer>
+  Generated by tea_tool · auto-builder · 2026-05-27 16:22<br>
+  Mermaid via CDN — internet required for first load, then cached.
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+  function pickMermaidTheme() {
+    const t = document.documentElement.getAttribute("data-theme");
+    if (t === "dark") return "dark";
+    if (t === "light") return "default";
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "default";
+  }
+  mermaid.initialize({ startOnLoad: true, theme: pickMermaidTheme(),
+                       flowchart: { htmlLabels: true, curve: "basis" } });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script>
+  function toggleTheme() {
+    const cur = document.documentElement.getAttribute("data-theme");
+    const next = (cur === "dark") ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    localStorage.setItem("tea-theme", next);
+    location.reload();
+  }
+  // restore
+  const saved = localStorage.getItem("tea-theme");
+  if (saved) document.documentElement.setAttribute("data-theme", saved);
+
+  const SENSITIVITY_DATA = {"Lignin price ($/kg)": [[0.05, 1.0332510860921824], [0.2, 2.9082510860921826], [0.4, 5.408251086092181], [0.8, 10.408251086092184], [1.5, 19.158251086092182]], "Vanillin sell price ($/kg)": [[5, 4.158251086092182], [15, 3.918251086092182], [25, 3.678251086092182], [40, 3.3182510860921823], [80, 2.3582510860921824]], "2-MeTHF recovery": [[0.9, 7.038251086092181], [0.95, 5.438251086092183], [0.99, 4.158251086092182], [0.995, 3.998251086092182], [0.999, 3.8702510860921824]]};
+  window.addEventListener("DOMContentLoaded", () => {
+    const txt = getComputedStyle(document.documentElement).getPropertyValue("--fg").trim();
+    const acc = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim();
+    for (const [title, points] of Object.entries(SENSITIVITY_DATA)) {
+      const id = "chart_" + title.replace(/[^a-zA-Z0-9]/g, "_");
+      const el = document.getElementById(id);
+      if (!el) continue;
+      new Chart(el, {
+        type: "line",
+        data: {
+          labels: points.map(p => p[0]),
+          datasets: [{
+            label: "MSP ($/kg)",
+            data: points.map(p => p[1]),
+            borderColor: acc, backgroundColor: acc + "33",
+            tension: 0.3, pointRadius: 5,
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          scales: { x: { ticks: { color: txt } },
+                    y: { ticks: { color: txt }, title: { display: true, text: "MSP ($/kg)", color: txt } } },
+          plugins: { legend: { display: false } }
+        }
+      });
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,492 @@
+# Component price database for the TEA tool
+#
+# Each entry: $/kg unless noted.  `source` documents WHERE the number came
+# from.  `lookup` URLs point to a public search page so the user can verify
+# / refresh manually (commercial price feeds like ICIS / S&P Global are
+# paywalled — we link to public proxies: ECHEMI, Made-in-China, Alibaba,
+# Trading Economics, EIA).
+#
+# Tag conventions:
+#   role: input | output | utility | catalyst | solvent | electrolyte
+#   tier: paper | market | estimate
+#
+# When the user clicks "Refresh price" in the UI, the app opens the lookup
+# URL(s) in a browser tab — actual web scraping of these sites is deliberately
+# avoided because they have aggressive anti-bot measures.  The user pastes the
+# new $/kg and saves.
+
+# ============================ Plastics / monomers ============================
+PET:
+  price_low: 0.10
+  price_high: 0.40
+  role: input
+  tier: paper
+  source: "Recycling Market 2024 (waste PET 0.10; virgin/recycled 0.25-0.40 ICIS 2024)"
+  lookup:
+    - https://www.icis.com/explore/commodities/chemicals/pet/
+    - https://www.echemi.com/productsInformation/pid_Seven10410-polyethyleneterephthalate.html
+    - https://www.alibaba.com/trade/search?SearchText=recycled+PET+flakes
+
+TPA:
+  price_low: 0.94
+  role: output
+  tier: paper
+  source: "ICIS 2024"
+  lookup:
+    - https://www.echemi.com/productsInformation/pid_Seven4-purifiedterephthalicacid.html
+    - https://www.icis.com/explore/commodities/chemicals/pta/
+
+FA:
+  price_low: 0.84
+  role: output
+  tier: paper
+  source: "ICIS 2024 (formic acid 90 %)"
+  lookup:
+    - https://www.echemi.com/productsInformation/pd20150901171.html
+
+# ============================ Solvents / acids / bases =======================
+DMSO:
+  price_low: 1.50
+  role: solvent
+  tier: paper
+  source: "Echemi 2024"
+  lookup:
+    - https://www.echemi.com/productsInformation/pd20150901029-dimethylsulfoxide.html
+
+H2SO4:
+  price_low: 0.037
+  role: solvent
+  tier: paper
+  source: "Made-in-China 2024 (98 %)"
+  lookup:
+    - https://www.made-in-china.com/products-search/hot-china-products/sulfuric-acid.html
+
+PMA:
+  price_low: 0.01
+  role: catalyst
+  tier: paper
+  source: "Made-in-China bulk listings; ChemicalBook 2026 lab-grade $59–1,240"
+  lookup:
+    - https://www.made-in-china.com/products-search/hot-china-products/Phosphomolybdic_Acid.html
+    - https://www.chemicalbook.com/Price/Phosphomolybdic-acid.htm
+
+KOH:
+  price_low: 1.00
+  role: electrolyte
+  tier: market
+  source: "industrial 2024"
+  lookup:
+    - https://www.echemi.com/productsInformation/pd20150901051-potassiumhydroxide.html
+
+NaOH:
+  price_low: 0.50
+  role: electrolyte
+  tier: market
+  source: "industrial 2024"
+  lookup:
+    - https://www.echemi.com/productsInformation/pd20150901005-sodiumhydroxide.html
+
+KHCO3:
+  price_low: 1.38
+  role: electrolyte
+  tier: paper
+  source: "Na et al. Nat Commun 2019 (s41467-019-12744-y)"
+  lookup:
+    - https://www.echemi.com/productsInformation/pd20150901195-potassiumbicarbonate.html
+
+H2O:
+  price_low: 0.00022
+  role: utility
+  tier: paper
+  source: "Nat Commun 12, 4679 (2021)"
+  lookup: []
+
+# ============================ Gases & energy ================================
+H2:
+  price_low: 8.0
+  role: output
+  tier: paper
+  source: "Hydrogen Council 2024 (industrial green H2 target $4-8/kg)"
+  lookup:
+    - https://www.iea.org/reports/global-hydrogen-review-2024
+    - https://hydrogencouncil.com/en/
+
+CO2:
+  price_low: 0.04
+  role: input
+  tier: paper
+  source: "DAC $0.04/kg (Bagemihl 2023); industrial $0.03 (Shin 2021)"
+  lookup:
+    - https://www.iea.org/reports/direct-air-capture-2022
+
+CO:
+  price_low: 0.60
+  role: output
+  tier: paper
+  source: "Na 2019 ($0.60/kg market); Shin 2021 ($0.80/kg)"
+  lookup:
+    - https://www.echemi.com/
+
+C2H4:
+  price_low: 1.30
+  role: output
+  tier: paper
+  source: "Bagemihl 2023 (ethylene $1.30/kg market)"
+  lookup:
+    - https://www.icis.com/explore/commodities/chemicals/ethylene/
+
+HCOOH:
+  price_low: 0.50
+  role: output
+  tier: paper
+  source: "Shin 2021 ($0.50/kg market formic acid)"
+  lookup:
+    - https://www.echemi.com/productsInformation/pd20150901103-formicacid.html
+
+O2:
+  price_low: 0.05
+  role: output
+  tier: market
+  source: "industrial bulk 2024"
+  lookup: []
+
+# ============================ Furans / bio chemicals ========================
+Furfural:
+  price_low: 1.17
+  price_high: 1.81
+  role: input
+  tier: paper
+  source: "Na 2019 (furfural $1.17-1.81/kg)"
+  lookup:
+    - https://www.echemi.com/productsInformation/pd20150901111-furfural.html
+
+FuroicAcid:
+  price_low: 5.0
+  role: output
+  tier: paper
+  source: "Na 2019 (2-furoic acid market price, range)"
+  lookup:
+    - https://www.echemi.com/
+
+HMF:
+  price_low: 1.33
+  role: input
+  tier: paper
+  source: "Na 2019 (5-HMF ~$1.33/L)"
+  lookup:
+    - https://www.echemi.com/
+
+FDCA:
+  price_low: 4.25
+  price_high: 580.0
+  role: output
+  tier: paper
+  source: "Na 2019 (FDCA market $32-580/kg, breakeven $4.25/kg)"
+  lookup: []
+
+Glycerol:
+  price_low: 0.50
+  role: input
+  tier: paper
+  source: "Na 2019 ($0.25-1.00/kg)"
+  lookup:
+    - https://www.echemi.com/productsInformation/pd20150901095-glycerine.html
+
+# ============================ Nitrogen species ==============================
+HNO3:
+  price_low: 0.30
+  role: input
+  tier: market
+  source: "Made-in-China 2024 (68 % HNO3)"
+  lookup:
+    - https://www.made-in-china.com/products-search/hot-china-products/nitric-acid.html
+
+NaNO3:
+  price_low: 0.50
+  role: input
+  tier: market
+  source: "industrial 2024"
+  lookup:
+    - https://www.echemi.com/productsInformation/pd20150901029.html
+
+NH2OH:
+  price_low: 1.72
+  role: output
+  tier: paper
+  source: "Mosalpuri 2023 (hydroxylamine market $1.72/kg)"
+  lookup:
+    - https://www.echemi.com/productsInformation/pd20150901029.html
+
+NH3:
+  price_low: 0.50
+  role: output
+  tier: market
+  source: "industrial 2024"
+  lookup:
+    - https://www.icis.com/explore/commodities/chemicals/ammonia/
+
+# ============================ Lignin oxidation =============================
+# All lookup URLs below were live-verified (HTTP 200, content present).  We deliberately
+# avoid Echemi pages — they 403 to automated checks AND many product slugs no longer
+# resolve in a browser either.  ChemicalBook price pages and Made-in-China.com search
+# pages are the most reliable public-access price proxies for these monomers.
+
+Organosolv Lignin:
+  price_low: 0.30
+  price_high: 0.86
+  role: input
+  tier: estimate
+  source: "Made-in-China 2026 lignosulfonate listings $200–860/ton (organosolv-grade slightly higher; representative technical-lignin proxy)"
+  lookup:
+    - https://www.made-in-china.com/products-search/hot-china-products/Lignin.html
+
+Vanillin:
+  price_low: 5.0
+  price_high: 11.0
+  role: output
+  tier: market
+  source: "Made-in-China 2026 verified bulk listings: $1.10–$11.28/kg at 500–5,000 kg MOQ (Hangzhou Union, Henan Yangsen, Shanghai Tianjia)"
+  lookup:
+    - https://www.chemicalbook.com/Price/Vanillin.htm
+    - https://www.made-in-china.com/products-search/hot-china-products/Vanillin.html
+
+Vanillic acid:
+  price_low: 10.0
+  price_high: 35.0
+  role: output
+  tier: market
+  source: "Made-in-China 2026 verified bulk: $1.50/kg (1-ton MOQ Shandong Deshang) to $35/kg (25-kg MOQ premium); excludes lab-grade $140–165/kg"
+  lookup:
+    - https://www.chemicalbook.com/Price/Vanillic-acid.htm
+    - https://www.made-in-china.com/products-search/hot-china-products/Vanillic_Acid.html
+
+Syringaldehyde:
+  price_low: 20.0
+  price_high: 100.0
+  role: output
+  tier: estimate
+  source: "Made-in-China 2026 verified: $4–$8.90/kg (Atomix, Mikem, Senfeida, 1–200 kg MOQ); $100–$400/kg specialty grade (Worldyang, Chuanghai)"
+  lookup:
+    - https://www.chemicalbook.com/Price/Syringaldehyde.htm
+    - https://www.made-in-china.com/products-search/hot-china-products/Syringaldehyde.html
+
+Syringic acid:
+  price_low: 5.0
+  price_high: 30.0
+  role: output
+  tier: estimate
+  source: "Made-in-China 2026 verified bulk: $2–$2.50/kg (Jiangsu Xinsu 200-kg MOQ), $1–$30/kg (Puyer 100-kg MOQ), $5–$15/kg (Mikem 1-kg MOQ)"
+  lookup:
+    - https://www.chemicalbook.com/Price/Syringic-acid.htm
+    - https://www.made-in-china.com/products-search/hot-china-products/Syringic_Acid.html
+
+Chloroform:
+  price_low: 1.50
+  price_high: 3.0
+  role: solvent
+  tier: market
+  source: "Industrial bulk estimate (ChemicalBook blocks chloroform listings as controlled precursor)"
+  lookup:
+    - https://pubchem.ncbi.nlm.nih.gov/compound/Chloroform
+
+# ============================ Biomass-derived ===============================
+Glucose:
+  price_low: 0.40
+  role: input
+  tier: market
+  source: "industrial dextrose 2024"
+  lookup:
+    - https://www.echemi.com/productsInformation/pd20150901241.html
+
+Ethanol:
+  price_low: 0.55
+  role: output
+  tier: paper
+  source: "Shin 2021 ($0.50/kg); biofuel market 2024"
+  lookup:
+    - https://www.icis.com/explore/commodities/chemicals/ethanol/
+
+# ============================ Auto-fetched (market) =========================
+# These are populated by the "🌐 Refresh prices from web" button — values
+# below are placeholders, real values pulled live from World Bank Pink Sheet
+# and Trading Economics.
+
+Methanol:
+  price_low: 0.46
+  role: input
+  tier: market
+  source: "Trading Economics (CNY/T → USD/kg, ECB FX)"
+  lookup:
+    - https://tradingeconomics.com/commodity/methanol
+    - https://www.methanex.com/about-methanol/methanex-monthly-average/
+
+Polyethylene:
+  price_low: 1.20
+  role: input
+  tier: market
+  source: "Trading Economics (CNY/T)"
+  lookup:
+    - https://tradingeconomics.com/commodity/polyethylene
+
+Polypropylene:
+  price_low: 1.25
+  role: input
+  tier: market
+  source: "Trading Economics (CNY/T)"
+  lookup:
+    - https://tradingeconomics.com/commodity/polypropylene
+
+PVC:
+  price_low: 0.75
+  role: input
+  tier: market
+  source: "Trading Economics (CNY/T)"
+  lookup:
+    - https://tradingeconomics.com/commodity/polyvinyl-chloride
+
+Styrene:
+  price_low: 1.40
+  role: input
+  tier: market
+  source: "Trading Economics (CNY/MT)"
+  lookup:
+    - https://tradingeconomics.com/commodity/styrene
+
+Sulfur:
+  price_low: 0.90
+  role: input
+  tier: market
+  source: "Trading Economics (CNY/T)"
+  lookup:
+    - https://tradingeconomics.com/commodity/sulfur-coal
+
+Urea:
+  price_low: 0.40
+  role: input
+  tier: market
+  source: "World Bank Pink Sheet ($/mt)"
+  lookup:
+    - https://tradingeconomics.com/commodity/urea
+    - https://www.worldbank.org/en/research/commodity-markets
+
+DAP:
+  price_low: 0.65
+  role: input
+  tier: market
+  source: "World Bank Pink Sheet ($/mt)"
+  lookup:
+    - https://www.worldbank.org/en/research/commodity-markets
+
+KCl:
+  price_low: 0.36
+  role: input
+  tier: market
+  source: "World Bank Pink Sheet ($/mt)"
+  lookup:
+    - https://www.worldbank.org/en/research/commodity-markets
+
+CrudeOil:
+  price_low: 0.45
+  role: input
+  tier: market
+  source: "World Bank Pink Sheet ($/bbl → $/kg)"
+  lookup:
+    - https://www.worldbank.org/en/research/commodity-markets
+
+NaturalGas:
+  price_low: 0.20
+  role: utility
+  tier: market
+  source: "World Bank Pink Sheet ($/MMBtu → $/kg)"
+  lookup:
+    - https://www.eia.gov/dnav/ng/hist/rngwhhdM.htm
+
+Coal:
+  price_low: 0.13
+  role: utility
+  tier: market
+  source: "Trading Economics ($/T)"
+  lookup:
+    - https://tradingeconomics.com/commodity/coal
+
+Naphtha:
+  price_low: 0.94
+  role: input
+  tier: market
+  source: "Trading Economics ($/T)"
+  lookup:
+    - https://tradingeconomics.com/commodity/naphtha
+
+Propane:
+  price_low: 0.43
+  role: utility
+  tier: market
+  source: "Trading Economics ($/Gal → $/kg)"
+  lookup:
+    - https://tradingeconomics.com/commodity/propane
+
+Soybeans:
+  price_low: 0.44
+  role: input
+  tier: market
+  source: "World Bank Pink Sheet ($/mt)"
+  lookup: []
+
+Maize:
+  price_low: 0.21
+  role: input
+  tier: market
+  source: "World Bank Pink Sheet ($/mt)"
+  lookup: []
+
+Wheat:
+  price_low: 0.24
+  role: input
+  tier: market
+  source: "World Bank Pink Sheet ($/mt)"
+  lookup: []
+
+Sugar:
+  price_low: 0.32
+  role: input
+  tier: market
+  source: "World Bank Pink Sheet ($/kg)"
+  lookup: []
+
+Aluminum:
+  price_low: 2.88
+  role: input
+  tier: market
+  source: "World Bank Pink Sheet ($/mt)"
+  lookup: []
+
+Copper:
+  price_low: 11.79
+  role: input
+  tier: market
+  source: "World Bank Pink Sheet ($/mt)"
+  lookup: []
+
+# ============================ Utility coefficients ==========================
+# (these aren't components but the UI lets the user override them)
+_meta:
+  electricity_$/kWh:
+    value: 0.0953
+    source: "Kepco 2024 industrial tariff"
+    lookup:
+      - https://home.kepco.co.kr/kepco/EN/F/htmlView/ENFBHP00103.do
+      - https://www.eia.gov/electricity/monthly/
+  electricity_$/kWh_USA:
+    value: 0.07
+    source: "US EIA industrial avg 2024"
+    lookup:
+      - https://www.eia.gov/electricity/monthly/
+  natural_gas_$/MMBtu:
+    value: 3.50
+    source: "EIA Henry Hub 2024 avg"
+    lookup:
+      - https://www.eia.gov/dnav/ng/ng_pri_sum_dcu_nus_m.htm
+  steam_LP_$/ton:
+    value: 12
+    source: "industry estimate"
+    lookup: []

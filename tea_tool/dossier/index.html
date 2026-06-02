@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>TEA Process Dossiers</title>
+<style>
+ :root{--bg:#fafafa;--fg:#141414;--muted:#666;--accent:#1565C0;--card:#fff;--border:#e3e3e3;--ok:#2e7d32;--warn:#e65100;}
+ @media(prefers-color-scheme:dark){:root{--bg:#161616;--fg:#ececec;--muted:#9a9a9a;--accent:#64B5F6;--card:#212121;--border:#333;--ok:#81c784;--warn:#ffb74d;}}
+ body{background:var(--bg);color:var(--fg);margin:0;font:15px/1.55 -apple-system,"Segoe UI",Roboto,Helvetica,Arial;}
+ .wrap{max-width:1200px;margin:0 auto;padding:32px 24px 64px;}
+ h1{margin:0 0 4px;font-size:26px;}
+ .sub{color:var(--muted);margin:0 0 24px;}
+ .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px 0;overflow:hidden;}
+ table{width:100%;border-collapse:collapse;}
+ th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--border);}
+ th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);cursor:pointer;user-select:none;}
+ td.num{text-align:right;font-variant-numeric:tabular-nums;}
+ tr:last-child td{border-bottom:none;}
+ tbody tr:hover{background:rgba(125,125,125,.07);}
+ a.paper{color:var(--accent);text-decoration:none;font-weight:600;}
+ a.paper:hover{text-decoration:underline;}
+ .badge{display:inline-block;padding:1px 8px;border-radius:10px;font-size:12px;font-weight:600;}
+ .v2{background:rgba(46,125,50,.15);color:var(--ok);}
+ .v1{background:rgba(230,81,0,.13);color:var(--warn);}
+ .pill{font-size:12px;color:var(--muted);}
+ .summary{display:flex;gap:24px;flex-wrap:wrap;margin:0 0 22px;}
+ .stat{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 20px;}
+ .stat b{display:block;font-size:24px;}
+ .stat span{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.04em;}
+ footer{color:var(--muted);font-size:12px;margin-top:28px;}
+ .err{color:#c62828;font-size:12px;}
+</style></head><body><div class="wrap">
+<h1>📊 TEA Process Dossiers</h1>
+<p class="sub">Techno-economic analysis for 24 processes · generated 2026-05-29 16:40. Click a paper to open its full dossier (PFD, stream table, CAPEX/OPEX, MSP, sensitivity, references) — one self-contained file, no internet needed except first chart load.</p>
+<div class="summary">
+  <div class="stat"><b>24</b><span>processes</span></div>
+  <div class="stat"><b>1</b><span>schema v2 (sourced)</span></div>
+  <div class="stat"><b>11</b><span>profitable @ market</span></div>
+  <div class="stat"><b>0</b><span>render failures</span></div>
+</div>
+<div class="card"><table id="t">
+<thead><tr>
+ <th onclick="sortT(0,'s')">Process</th>
+ <th onclick="sortT(1,'s')">Product</th>
+ <th class="num" onclick="sortT(2,'n')">MSP $/kg</th>
+ <th class="num" onclick="sortT(3,'n')">Paper $/kg</th>
+ <th class="num" onclick="sortT(4,'n')">CAPEX $M</th>
+ <th onclick="sortT(5,'s')">Schema</th>
+ <th onclick="sortT(6,'s')">Refs</th>
+ <th onclick="sortT(7,'s')">PFD</th>
+</tr></thead><tbody>
+<tr><td data-v="coor_orr_sys1_pulse"><a class='paper' href='coor_orr_sys1_pulse.html'>COOR-ORR paired electrolysis (1V pulse, LDG feed)</a></td><td>H2O2</td><td class='num' data-v='-1.4448237953350316'>-1.44</td><td class='num'>—</td><td class='num' data-v='11.9008'>11.9</td><td><span class='badge v1'>v1</span></td><td class='pill'>0/4</td><td>—</td></tr>
+<tr><td data-v="coor_orr_sys2_oer"><a class='paper' href='coor_orr_sys2_oer.html'>OER-ORR baseline (1.5V continuous)</a></td><td>H2O2</td><td class='num' data-v='24.381517408019345'>24.38</td><td class='num'>—</td><td class='num' data-v='5.6814'>5.7</td><td><span class='badge v1'>v1</span></td><td class='pill'>0/3</td><td>—</td></tr>
+<tr><td data-v="coor_orr_sys3_galvanic"><a class='paper' href='coor_orr_sys3_galvanic.html'>Galvanic COOR-ORR (0V, LDG + air)</a></td><td>H2O2</td><td class='num' data-v='212.91646992931769'>212.92</td><td class='num'>—</td><td class='num' data-v='8.7867'>8.8</td><td><span class='badge v1'>v1</span></td><td class='pill'>0/4</td><td>—</td></tr>
+<tr><td data-v="coor_orr_sys4_pureCO"><a class='paper' href='coor_orr_sys4_pureCO.html'>COOR-ORR with pure CO feed (1V pulse)</a></td><td>H2O2</td><td class='num' data-v='114.49893122045424'>114.50</td><td class='num'>—</td><td class='num' data-v='8.5536'>8.6</td><td><span class='badge v1'>v1</span></td><td class='pill'>0/4</td><td>—</td></tr>
+<tr><td data-v="lignin_pma_mw"><a class='paper' href='lignin_pma_mw.html'>Lignin oxidation - microwave + PMA</a></td><td>Vanillin</td><td class='num' data-v='-4.397156668251535'>-4.40</td><td class='num'>—</td><td class='num' data-v='4.7272'>4.7</td><td><span class='badge v1'>v1</span></td><td class='pill'>0/4</td><td>—</td></tr>
+<tr><td data-v="paper_bagemihl_2023_ethylene"><a class='paper' href='paper_bagemihl_2023_ethylene.html'>Bagemihl 2023 — CO2 -&gt; Ethylene (Cu-GDE)</a></td><td>C2H4</td><td class='num' data-v='0.11736963858190523'>0.12</td><td class='num'>—</td><td class='num' data-v='6.1617'>6.2</td><td><span class='badge v1'>v1</span></td><td class='pill'>0/4</td><td>—</td></tr>
+<tr><td data-v="paper_blanc_2024_lignin_hat"><a class='paper' href='paper_blanc_2024_lignin_hat.html'>HAT-mediated electrocatalytic lignin valorization (Green Chem 2024)</a></td><td>Vanillin</td><td class='num' data-v='13.146918260768663'>13.15</td><td class='num'>16.86</td><td class='num' data-v='15.2518'>15.3</td><td><span class='badge v1'>v1</span></td><td class='pill'>0/5</td><td>—</td></tr>
+<tr><td data-v="paper_glycerol_formic"><a class='paper' href='paper_glycerol_formic.html'>Glycerol -&gt; formic acid (industrial-level EO)</a></td><td>FA</td><td class='num' data-v='0.04959980964275672'>0.05</td><td class='num'>0.85</td><td class='num' data-v='12.8396'>12.8</td><td><span class='badge v1'>v1</span></td><td class='pill'>0/3</td><td>—</td></tr>
+<tr><td data-v="paper_hmf_to_fdca"><a class='paper' href='paper_hmf_to_fdca.html'>HMF -&gt; FDCA (Ni/NiOOH foam, electrochemical)</a></td><td>FDCA</td><td class='num' data-v='2.8295261457573306'>2.83</td><td class='num'>4.00</td><td class='num' data-v='7.5931'>7.6</td><td><span class='badge v1'>v1</span></td><td class='pill'>0/3</td><td>—</td></tr>
+<tr><td data-v="paper_li_2025_h2o2_spillover"><a class='paper' href='paper_li_2025_h2o2_spillover.html'>Li 2025 — Water spillover 2e-ORR</a></td><td>H2O2</td><td class='num' data-v='0.9875173125841471'>0.99</td><td class='num'>1.21</td><td class='num' data-v='5.6709'>5.7</td><td><span class='badge v1'>v1</span></td><td class='pill'>0/3</td><td>—</td></tr>
+<tr><td data-v="paper_liu_2020_glucose_glucaric"><a class='paper' href='paper_liu_2020_glucose_glucaric.html'>Liu 2020 — Glucose -&gt; glucaric acid + H2 (NiFe)</a></td><td>Glucaric acid</td><td class='num' data-v='0.5264882428900339'>0.53</td><td class='num'>2.50</td><td class='num' data-v='8.0744'>8.1</td><td><span class='badge v1'>v1</span></td><td class='pill'>0/3</td><td>—</td></tr>
+<tr><td data-v="paper_mosalpuri_2023_nh2oh"><a class='paper' href='paper_mosalpuri_2023_nh2oh.html'>Mosalpuri 2023 — Nitrate -&gt; Hydroxylamine</a></td><td>NH2OH</td><td class='num' data-v='1.5756398237655262'>1.58</td><td class='num'>—</td><td class='num' data-v='13.3533'>13.4</td><td><span class='badge v1'>v1</span></td><td class='pill'>0/3</td><td>—</td></tr>
+<tr><td data-v="paper_na_2019_co2rr_oor"><a class='paper' href='paper_na_2019_co2rr_oor.html'>Na 2019 — CO2RR-OOR (CO + 2-furoic acid)</a></td><td>FuroicAcid</td><td class='num' data-v='-2.963878553391065'>-2.96</td><td class='num'>—</td><td class='num' data-v='12.3685'>12.4</td><td><span class='badge v1'>v1</span></td><td class='pill'>0/4</td><td>—</td></tr>
+<tr><td data-v="paper_nie_2025_h2o2_seawater"><a class='paper' href='paper_nie_2025_h2o2_seawater.html'>Nie 2025 — Ampere-level H2O2 in seawater (Ni(OH)2/CNT)</a></td><td>H2O2</td><td class='num' data-v='0.9923493610444243'>0.99</td><td class='num'>0.95</td><td class='num' data-v='4.2319'>4.2</td><td><span class='badge v1'>v1</span></td><td class='pill'>0/2</td><td>—</td></tr>
+<tr><td data-v="paper_oh_2026_pet_pma"><a class='paper' href='paper_oh_2026_pet_pma.html'>Oh 2026 — Mild PET hydrolysis (PMA + EC)</a> <a class='pill' href='paper_oh_2026_pet_pma_scenarios.html' style='color:var(--accent)'>· product-strategy scenarios</a></td><td>TPA</td><td class='num' data-v='0.6641638723430646'>0.66</td><td class='num'>0.81</td><td class='num' data-v='133.1059'>133.1</td><td><span class='badge v2'>v2</span></td><td class='pill'>5/5</td><td>✓</td></tr>
+<tr><td data-v="paper_qi_2023_h2o2_pet"><a class='paper' href='paper_qi_2023_h2o2_pet.html'>Qi 2023 — H2O2 + PET upcycling (Ni-Mn)</a></td><td>H2O2</td><td class='num' data-v='-0.25069518612500336'>-0.25</td><td class='num'>0.51</td><td class='num' data-v='11.4074'>11.4</td><td><span class='badge v1'>v1</span></td><td class='pill'>0/4</td><td>—</td></tr>
+<tr><td data-v="paper_shin_2021_hcooh"><a class='paper' href='paper_shin_2021_hcooh.html'>Shin 2021 — CO2 -&gt; HCOOH (BPM MEA)</a></td><td>HCOOH</td><td class='num' data-v='0.0031553508385364004'>0.00</td><td class='num'>—</td><td class='num' data-v='28.7125'>28.7</td><td><span class='badge v1'>v1</span></td><td class='pill'>0/2</td><td>—</td></tr>
+<tr><td data-v="paper_sun_2024_h2o2_dualpath"><a class='paper' href='paper_sun_2024_h2o2_dualpath.html'>Sun 2024 — Dual-pathway H2O2 (2e-ORR + 2e-WOR)</a></td><td>H2O2</td><td class='num' data-v='0.6312188149211091'>0.63</td><td class='num'>0.79</td><td class='num' data-v='5.6721'>5.7</td><td><span class='badge v1'>v1</span></td><td class='pill'>0/3</td><td>—</td></tr>
+<tr><td data-v="paper_sun_2024_h2o2_eg"><a class='paper' href='paper_sun_2024_h2o2_eg.html'>Sun 2024 — paired H2O2 + glycolic acid (Ni-SAC + EG)</a></td><td>H2O2</td><td class='num' data-v='-4.551164958207451'>-4.55</td><td class='num'>1.09</td><td class='num' data-v='8.5431'>8.5</td><td><span class='badge v1'>v1</span></td><td class='pill'>0/4</td><td>—</td></tr>
+<tr><td data-v="paper_wang_2025_h2o2_gde"><a class='paper' href='paper_wang_2025_h2o2_gde.html'>Wang 2025 — Laser Ni-C GDE for industrial H2O2</a></td><td>H2O2</td><td class='num' data-v='1.0547889808813613'>1.05</td><td class='num'>0.85</td><td class='num' data-v='4.2332'>4.2</td><td><span class='badge v1'>v1</span></td><td class='pill'>0/3</td><td>—</td></tr>
+<tr><td data-v="paper_yim_2022_A_h2_msp"><a class='paper' href='paper_yim_2022_A_h2_msp.html'>Yim/Oh 2022 — Option A (H2 as MSP product)</a></td><td>H2</td><td class='num' data-v='413.20214478142645'>413.20</td><td class='num'>—</td><td class='num' data-v='12.9298'>12.9</td><td><span class='badge v1'>v1</span></td><td class='pill'>0/5</td><td>—</td></tr>
+<tr><td data-v="paper_yim_2022_C_metHF"><a class='paper' href='paper_yim_2022_C_metHF.html'>Yim/Oh 2022 — Option C (2-MeTHF instead of CHCl3)</a></td><td>H2</td><td class='num' data-v='430.68297717720026'>430.68</td><td class='num'>—</td><td class='num' data-v='16.5327'>16.5</td><td><span class='badge v1'>v1</span></td><td class='pill'>0/5</td><td>—</td></tr>
+<tr><td data-v="paper_yim_2022_modular_flow_lignin"><a class='paper' href='paper_yim_2022_modular_flow_lignin.html'>Yim/Oh 2022 — Modular flow lignin -&gt; aromatics + low-V H2</a></td><td>Vanillin</td><td class='num' data-v='1830.6674774125734'>1830.67</td><td class='num'>—</td><td class='num' data-v='12.9298'>12.9</td><td><span class='badge v1'>v1</span></td><td class='pill'>0/5</td><td>—</td></tr>
+<tr><td data-v="spent_lfp_ballmill_li"><a class='paper' href='spent_lfp_ballmill_li.html'>Spent LFP Black Mass to Li2CO3 (Mechanochemical, Li-only)</a></td><td>Li2CO3</td><td class='num' data-v='12.971850341736667'>12.97</td><td class='num'>—</td><td class='num' data-v='28.4207'>28.4</td><td><span class='badge v1'>v1</span></td><td class='pill'>0/5</td><td>—</td></tr>
+</tbody></table></div>
+<footer>tea_tool · open each dossier offline · re-generate with <code>python generate_dossiers.py</code></footer>
+</div>
+<script>
+function sortT(col,typ){
+ var t=document.getElementById('t'),tb=t.tBodies[0],rows=[].slice.call(tb.rows);
+ var dir=t.getAttribute('data-c')==col&&t.getAttribute('data-d')=='1'?-1:1;
+ rows.sort(function(a,b){
+  var x=a.cells[col].getAttribute('data-v')||a.cells[col].innerText;
+  var y=b.cells[col].getAttribute('data-v')||b.cells[col].innerText;
+  if(typ=='n'){x=parseFloat(x);y=parseFloat(y);if(isNaN(x))x=1e18;if(isNaN(y))y=1e18;return (x-y)*dir;}
+  return x.localeCompare(y)*dir;
+ });
+ rows.forEach(function(r){tb.appendChild(r);});
+ t.setAttribute('data-c',col);t.setAttribute('data-d',dir==1?'1':'0');
+}
+</script>
+</body></html>
