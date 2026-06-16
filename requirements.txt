@@ -1,0 +1,9 @@
+# Dependencies for Streamlit Community Cloud deployment.
+# App entrypoint: tea_tool/app.py
+# (mirrors tea_tool/requirements.txt — kept at repo root so the cloud build finds it)
+streamlit>=1.30
+pandas>=2.0
+plotly>=5.18
+openpyxl>=3.1
+streamlit-flow-component>=1.5
+pyyaml>=6.0
